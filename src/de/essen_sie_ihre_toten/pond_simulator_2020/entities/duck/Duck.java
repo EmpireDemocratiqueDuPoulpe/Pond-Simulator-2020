@@ -122,30 +122,11 @@ public class Duck {
 
         double angle = Math.atan2(deltaY, deltaX);
 
-        //boolean movedOnX = false;
-        //boolean movedOnY = false;
-
-        /*if (!(1 > deltaX && deltaX >= 0)) {
-            this.x = (float) (this.x + (this.speed * Math.cos(angle) * delta));
-            movedOnX = true;
-        }
-
-        if (!(1 > deltaY && deltaY >= 0))  {
-            this.y = (float) (this.y + (this.speed * Math.sin(angle) * delta));
-            movedOnY = true;
-        }*/
-
         float nextX = (float) (this.x + (this.speed * Math.cos(angle) * delta));
         float nextY = (float) (this.y + (this.speed * Math.sin(angle) * delta));
 
         // Collisions
-        Image solidTile = map.getTileImage(
-            (int) nextX / map.getTileWidth(),
-            (int) nextY / map.getTileHeight(),
-            map.getLayerIndex("Collisions")
-        );
-
-        if (solidTile != null) { this.isMoving = false; }
+        if (isEnteringCollision(map, nextX, nextY)) { this.isMoving = false; }
         // Move
         else {
             this.x = nextX;
@@ -153,8 +134,6 @@ public class Duck {
 
             getMoveDir();
         }
-
-        //if (!movedOnX && !movedOnY) this.isMoving = false;
     }
 
     private void getNewTarget() {
@@ -165,6 +144,29 @@ public class Duck {
         this.targetY = this.y + ThreadLocalRandom.current().nextInt(min, max + 1);
 
         this.isMoving = true;
+    }
+
+    private boolean isEnteringCollision(TiledMap map, float nextX, float nextY) {
+        Image solidTile = map.getTileImage(
+                (int) nextX / map.getTileWidth(),
+                (int) nextY / map.getTileHeight(),
+                map.getLayerIndex("Collisions")
+        );
+
+        boolean collision = solidTile != null;
+
+        if (collision) {
+
+            // Still collide if this is not a transparent pixel
+            Color color = solidTile.getColor(
+                    (int) nextX % map.getTileWidth(),
+                    (int) nextY % map.getTileHeight()
+            );
+
+            collision = color.getAlpha() > 0;
+        }
+
+        return collision;
     }
 
     private void getMoveDir() {
