@@ -46,13 +46,16 @@ public class PondState extends BasicGameState {
 
     @Override
     public void render(GameContainer container, StateBasedGame game, Graphics graphics) {
-        // Map
+        // Normal level of the map
         this.map.render(0, 0, this.map.getLayerIndex("Pond"));
 
         // Ducks
         for (Duck duck : this.ducks) {
             duck.render(graphics);
         }
+
+        // Map layers in front of ducks
+        this.map.render(0, 0, this.map.getLayerIndex("aboveEntities"));
     }
 
     @Override
