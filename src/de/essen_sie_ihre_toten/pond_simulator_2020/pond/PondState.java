@@ -31,12 +31,9 @@ public class PondState extends BasicGameState {
         // Load map
         this.map = new TiledMap("resources/maps/pond.tmx");
 
-        // Init four ducks
+        // Init ducks
         this.ducks = new Duck[]{
-                new Duck(200, 200),
-                new Duck(250, 250),
-                new Duck(300, 300),
-                new Duck(350, 350)
+                new Duck(200, 200)
         };
 
         // Load spritesheets
@@ -48,7 +45,7 @@ public class PondState extends BasicGameState {
     }
 
     @Override
-    public void render(GameContainer container, StateBasedGame game, Graphics graphics) throws SlickException {
+    public void render(GameContainer container, StateBasedGame game, Graphics graphics) {
         // Map
         this.map.render(0, 0);
 
@@ -59,8 +56,11 @@ public class PondState extends BasicGameState {
     }
 
     @Override
-    public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
-
+    public void update(GameContainer container, StateBasedGame game, int delta) {
+        for (Duck duck : this.ducks) {
+            duck.move(delta);
+            //System.out.println(duck);;
+        }
     }
 
     @Override
