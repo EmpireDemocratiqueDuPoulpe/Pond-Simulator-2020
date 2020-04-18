@@ -1,10 +1,7 @@
 package de.essen_sie_ihre_toten.pond_simulator_2020.pond;
 
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.Duck;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Input;
-import org.newdawn.slick.SlickException;
+import org.newdawn.slick.*;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.tiled.TileSet;
@@ -33,7 +30,10 @@ public class PondState extends BasicGameState {
 
         // Init ducks
         this.ducks = new Duck[]{
-                new Duck(200, 200)
+                new Duck(200, 200),
+                new Duck(200, 200),
+                new Duck(200, 200),
+                new Duck(200, 200),
         };
 
         // Load spritesheets
@@ -47,7 +47,7 @@ public class PondState extends BasicGameState {
     @Override
     public void render(GameContainer container, StateBasedGame game, Graphics graphics) {
         // Map
-        this.map.render(0, 0);
+        this.map.render(0, 0, this.map.getLayerIndex("Pond"));
 
         // Ducks
         for (Duck duck : this.ducks) {
@@ -58,8 +58,7 @@ public class PondState extends BasicGameState {
     @Override
     public void update(GameContainer container, StateBasedGame game, int delta) {
         for (Duck duck : this.ducks) {
-            duck.move(delta);
-            //System.out.println(duck);;
+            duck.move(map, delta);
         }
     }
 

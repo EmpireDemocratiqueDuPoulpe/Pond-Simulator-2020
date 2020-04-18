@@ -1,6 +1,7 @@
 package de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck;
 
 import org.newdawn.slick.*;
+import org.newdawn.slick.tiled.TiledMap;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -29,7 +30,7 @@ public class Duck {
         this.targetX = this.x;
         this.targetY = this.y;
         this.dir = 1;
-        this.speed = 0.5f;
+        this.speed = 0.2f;
         this.isMoving = false;
     }
 
@@ -42,12 +43,12 @@ public class Duck {
         this.targetX = this.x;
         this.targetY = this.y;
         this.dir = 1;
-        this.speed = 0.5f;
+        this.speed = 0.2f;
         this.isMoving = false;
     }
 
     // Getters
-    public int getDucksCount()          { return ducksCount; }
+    public static int getDucksCount()   { return ducksCount; }
     public int getId()                  { return this.id; }
     public float getX()                 { return this.x; }
     public float getY()                 { return this.y; }
@@ -105,21 +106,26 @@ public class Duck {
     }
 
     // Movement
-    public void move(int delta) {
+    public void move(TiledMap map, int delta) {
         // Compute dir
         if (!this.isMoving) { getNewTarget(); }
 
-        // Collisions
-
-        // Move
+        // Get the next pos
         double deltaX = this.targetX - this.x;
         double deltaY = this.targetY - this.y;
+
+        // The duck is arrived
+        if ((1 > deltaX && deltaX > -1) && (1 > deltaY && deltaY > -1)) {
+            this.isMoving = false;
+            return;
+        }
+
         double angle = Math.atan2(deltaY, deltaX);
 
-        boolean movedOnX = false;
-        boolean movedOnY = false;
+        //boolean movedOnX = false;
+        //boolean movedOnY = false;
 
-        if (!(1 > deltaX && deltaX >= 0)) {
+        /*if (!(1 > deltaX && deltaX >= 0)) {
             this.x = (float) (this.x + (this.speed * Math.cos(angle) * delta));
             movedOnX = true;
         }
@@ -127,16 +133,33 @@ public class Duck {
         if (!(1 > deltaY && deltaY >= 0))  {
             this.y = (float) (this.y + (this.speed * Math.sin(angle) * delta));
             movedOnY = true;
+        }*/
+
+        float nextX = (float) (this.x + (this.speed * Math.cos(angle) * delta));
+        float nextY = (float) (this.y + (this.speed * Math.sin(angle) * delta));
+
+        // Collisions
+        Image solidTile = map.getTileImage(
+            (int) nextX / map.getTileWidth(),
+            (int) nextY / map.getTileHeight(),
+            map.getLayerIndex("Collisions")
+        );
+
+        if (solidTile != null) { this.isMoving = false; }
+        // Move
+        else {
+            this.x = nextX;
+            this.y = nextY;
+
+            getMoveDir();
         }
 
-        getMoveDir();
-
-        if (!movedOnX && !movedOnY) this.isMoving = false;
+        //if (!movedOnX && !movedOnY) this.isMoving = false;
     }
 
     private void getNewTarget() {
-        int min = -216;
-        int max = +216;
+        int min = -300;
+        int max = +300;
 
         this.targetX = this.x + ThreadLocalRandom.current().nextInt(min, max + 1);
         this.targetY = this.y + ThreadLocalRandom.current().nextInt(min, max + 1);
@@ -154,7 +177,6 @@ public class Duck {
         }
         // Vertical
         else {
-            System.out.println();
             this.dir = (this.targetY >= this.y) ? 2 : 0; // 2: Bottom / 0: Top
         }
     }
