@@ -18,17 +18,18 @@ public class MainMenuState extends BasicGameState {
 
     // Methods
     @Override
-    public void init(GameContainer container, StateBasedGame game) throws SlickException {
+    public void init(GameContainer container, StateBasedGame game) {
+        //container.setShowFPS(false);
         this.game = game;
     }
 
     @Override
-    public void render(GameContainer container, StateBasedGame game, Graphics graphics) throws SlickException {
+    public void render(GameContainer container, StateBasedGame game, Graphics graphics) {
 
     }
 
     @Override
-    public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
+    public void update(GameContainer container, StateBasedGame game, int delta) {
 
     }
 
