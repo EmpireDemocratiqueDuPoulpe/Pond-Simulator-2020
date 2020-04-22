@@ -20,7 +20,12 @@ public class Duck {
     private float speed;
     private boolean isMoving;
 
-    private static Animation[] animations = new Animation[8];
+    private float hp;
+    private float fp;
+    private boolean isDead;
+    private float deathTimer;
+
+    private static Animation[] animations = new Animation[9];
 
     // Constructors
     public Duck() {
@@ -34,6 +39,11 @@ public class Duck {
         this.dir = 1;
         this.speed = 0.2f;
         this.isMoving = false;
+
+        this.hp = 100;
+        this.fp = 100;
+        this.isDead = false;
+        this.deathTimer = 0;
     }
 
     public Duck(float x, float y) {
@@ -47,6 +57,11 @@ public class Duck {
         this.dir = 1;
         this.speed = 0.2f;
         this.isMoving = false;
+
+        this.hp = 100;
+        this.fp = 100;
+        this.isDead = false;
+        this.deathTimer = 0;
     }
 
     // Getters
@@ -59,9 +74,14 @@ public class Duck {
     public int getDir()                 { return this.dir; }
     public float getSpeed()             { return this.speed; }
     public boolean isMoving()           { return this.isMoving; }
+    public float getHp()                { return this.hp; }
+    public float getFp()                { return this.fp; }
+    public boolean isDead()             { return this.isDead; }
+    public float getDeathTimer()        { return this.deathTimer; }
     public Animation[] getAnimations()  { return animations; }
 
     // Setters
+    public static void setDucksCount(int count)         { ducksCount = count; }
     public void setX(float x)                           { this.x = x; }
     public void setY(float y)                           { this.y = y; }
     public void setTargetX(float targetX)               { this.targetX = targetX; }
@@ -69,6 +89,10 @@ public class Duck {
     public void setDir(int dir)                         { this.dir = dir; }
     public void setSpeed(float speed)                   { this.speed = speed; }
     public void setMoving(boolean isMoving)             { this.isMoving = isMoving; }
+    public void setHp(float hp)                         { this.hp = hp; }
+    public void setFp(float fp)                         { this.fp = fp; }
+    public void setDead(boolean isDead)                 { this.isDead = isDead; }
+    public void setDeathTimer(float deathTimer)         { this.deathTimer = deathTimer; }
 
     // Methods
     // Rendering
@@ -86,6 +110,9 @@ public class Duck {
         animations[5] = loadAnimation(spriteSheet, 1, 3, 1); // Left
         animations[6] = loadAnimation(spriteSheet, 1, 3, 2); // Bottom
         animations[7] = loadAnimation(spriteSheet, 1, 3, 3); // Right
+
+        // Die
+        animations[8] = loadAnimation(spriteSheet, 0, 5, 4);
     }
 
     private static Animation loadAnimation(SpriteSheet spriteSheet, int startX, int endX, int y) {
@@ -99,12 +126,17 @@ public class Duck {
     }
 
     public void render(Graphics graphics) {
-        // Shadow
-        graphics.setColor(new Color(0, 0, 0, .5f));
-        graphics.fillOval(x - 16, y - 8, 32, 16);
+        if (!this.isDead) {
+            // Shadow
+            graphics.setColor(new Color(0, 0, 0, .5f));
+            graphics.fillOval(x - 16, y - 8, 32, 16);
 
-        // Duck
-        graphics.drawAnimation(animations[this.dir + (this.isMoving ? 4 : 0)], this.x - 16, this.y - 32);
+            // Duck
+            graphics.drawAnimation(animations[this.dir + (this.isMoving ? 4 : 0)], this.x - 16, this.y - 32);
+        } else {
+            graphics.drawAnimation(animations[8], this.x - 16, this.y - 32);
+        }
+
     }
 
     public void renderDebug() {
@@ -115,6 +147,20 @@ public class Duck {
         for (String line : lines) {
             PondState.debugTtf.drawString(textX, textY, line, Color.white);
             textY += 14;
+        }
+    }
+
+    // Update
+    public void update(TiledMap map, int delta) {
+        if (!this.isDead) {
+            move(map, delta);
+            loseFoodPoint(delta);
+        } else {
+            this.deathTimer += .01f * delta;
+
+            if (this.deathTimer > 5) {
+                PondState.addToDeathList(this.id);
+            }
         }
     }
 
@@ -196,15 +242,35 @@ public class Duck {
         }
     }
 
+    // Food
+    private void loseFoodPoint(int delta) {
+        // Remove food point or health point
+        if (this.fp > 0) {
+            this.fp -= .01f * delta;
+        } else {
+            this.fp = 0;
+            this.hp -= .01f * delta;
+        }
+
+        // Check if the duck is dead
+        if (this.hp <= 0) {
+            this.hp = 0;
+            this.isDead = true;
+        }
+    }
+
     // Others
     @Override
     public String toString() {
         return "Duck n°" + this.id + ":\n" +
-                "x: " + this.x + "px\n" +
-                "y: " + this.y + "px\n" +
-                "targetX: " + this.targetX + "px\n" +
-                "targetY: " + this.targetY + "px\n" +
+                "x: " + Math.round(this.x) + "px\n" +
+                "y: " + Math.round(this.y) + "px\n" +
+                "targetX: " + Math.round(this.targetX) + "px\n" +
+                "targetY: " + Math.round(this.targetY) + "px\n" +
                 "dir: " + this.dir + "\n" +
-                "isMoving: " + this.isMoving + "\n";
+                "isMoving: " + this.isMoving + "\n" +
+                "HP: " + Math.round(this.hp) + "\n" +
+                "FP: " + Math.round(this.fp) + "\n" +
+                "isDead: " + this.isDead;
     }
 }

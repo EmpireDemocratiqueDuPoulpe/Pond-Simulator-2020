@@ -18,7 +18,7 @@ public class MainMenuState extends BasicGameState {
     // Methods
     @Override
     public void init(GameContainer container, StateBasedGame game) {
-        //container.setShowFPS(false);
+        container.setShowFPS(false);
         this.game = game;
     }
 
