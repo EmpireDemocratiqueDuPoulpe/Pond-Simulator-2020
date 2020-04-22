@@ -4,7 +4,6 @@ import de.essen_sie_ihre_toten.pond_simulator_2020.pond.PondState;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 

@@ -1,5 +1,7 @@
 package de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck;
 
+import de.essen_sie_ihre_toten.pond_simulator_2020.pond.PondState;
+
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
 
@@ -103,6 +105,17 @@ public class Duck {
 
         // Duck
         graphics.drawAnimation(animations[this.dir + (this.isMoving ? 4 : 0)], this.x - 16, this.y - 32);
+    }
+
+    public void renderDebug() {
+        String[] lines = this.toString().split("\n");
+        float textX = this.x - 40;
+        float textY = this.y;
+
+        for (String line : lines) {
+            PondState.debugTtf.drawString(textX, textY, line, Color.white);
+            textY += 14;
+        }
     }
 
     // Movement

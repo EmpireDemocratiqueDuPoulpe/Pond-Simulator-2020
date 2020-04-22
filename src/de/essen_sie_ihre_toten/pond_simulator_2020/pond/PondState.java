@@ -1,24 +1,36 @@
 package de.essen_sie_ihre_toten.pond_simulator_2020.pond;
 
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.Duck;
-
 import de.essen_sie_ihre_toten.pond_simulator_2020.hud.HUD;
+
 import org.newdawn.slick.*;
+import org.newdawn.slick.Graphics;
+import org.newdawn.slick.font.effects.ColorEffect;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.tiled.TiledMap;
+
+import java.awt.*;
+import java.awt.Font;
+import java.io.File;
+import java.io.IOException;
 
 public class PondState extends BasicGameState {
     // Attributes
     public static final int ID = 2;
     private GameContainer container;
     private StateBasedGame game;
+    private boolean debug;
 
     private TiledMap map;
     private HUD hud;
     private Duck[] ducks;
 
     private Music bgMusic;
+
+    public static TrueTypeFont hudTtf;
+    public static TrueTypeFont debugTtf;
+    //public static TrueTypeFont hudTtf;
 
     // Getters
     public int getID() { return ID; }
@@ -29,6 +41,7 @@ public class PondState extends BasicGameState {
     public void init(GameContainer container, StateBasedGame game) throws SlickException {
         this.container = container;
         this.game = game;
+        this.debug = false;
 
         // Load map
         this.map = new TiledMap("resources/maps/pond.tmx");
@@ -53,6 +66,13 @@ public class PondState extends BasicGameState {
 
         // Load musics
         loadMusics();
+
+        // Load fonts
+        try {
+            loadFonts();
+        } catch (FontFormatException | IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -69,7 +89,14 @@ public class PondState extends BasicGameState {
         this.map.render(0, 0, this.map.getLayerIndex("aboveEntities"));
 
         // HUD
-        this.hud.render(graphics);
+        this.hud.render(container, graphics);
+
+        // Debug
+        if (this.debug) {
+            for (Duck duck : this.ducks) {
+                duck.renderDebug();
+            }
+        }
     }
 
     @Override
@@ -81,12 +108,14 @@ public class PondState extends BasicGameState {
 
     @Override
     public void keyReleased(int key, char c) {
+        // Activate debug
+        if (Input.KEY_D == key)             { this.debug = !this.debug; }
         // Exit game with ESC
-        if (Input.KEY_ESCAPE == key) { this.container.exit(); }
+        else if (Input.KEY_ESCAPE == key)   { this.container.exit(); }
     }
 
     // Musics
-    public void loadMusics() {
+    private void loadMusics() {
         /*File[] files = folder.listFiles();
 
         if (files != null) {
@@ -107,5 +136,21 @@ public class PondState extends BasicGameState {
             sE.printStackTrace();
         }
 
+    }
+
+    // Fonts
+    private void loadFonts() throws FontFormatException, IOException {
+        Font debugFont = new Font("Verdana", Font.PLAIN, 14);
+        debugTtf = new TrueTypeFont(debugFont, true);
+
+
+        Font hudFont = Font.createFont(Font.TRUETYPE_FONT, new File("./src/resources/fonts/game_over_cre.ttf"));
+        hudFont = hudFont.deriveFont(Font.PLAIN, 14);
+
+        hudTtf = new TrueTypeFont(hudFont, true);
+        /*hudTtf.addAsciiGlyphs();
+        hudTtf.getEffects().add(new ColorEffect(java.awt.Color.white));
+        hudTtf.addAsciiGlyphs();
+        hudTtf.loadGlyphs();*/
     }
 }

@@ -11,7 +11,7 @@ import org.newdawn.slick.state.StateBasedGame;
 public class Game extends StateBasedGame {
     // Main
     public static void main(String[] args) throws SlickException {
-        new AppGameContainer(new Game(), 1000, 600, false).start();
+        new AppGameContainer(new Game(), 960, 640, false).start();
     }
 
     // Constructors
@@ -21,7 +21,7 @@ public class Game extends StateBasedGame {
 
     // Methods
     @Override
-    public void initStatesList(GameContainer container) throws SlickException {
+    public void initStatesList(GameContainer container) {
         addState(new MainMenuState());
         addState(new PondState());
     }
