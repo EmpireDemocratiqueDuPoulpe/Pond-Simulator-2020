@@ -34,6 +34,6 @@ public class MainMenuState extends BasicGameState {
 
     @Override
     public void keyReleased(int key, char c) {
-        game.enterState(PondState.ID);
+        this.game.enterState(PondState.ID);
     }
 }

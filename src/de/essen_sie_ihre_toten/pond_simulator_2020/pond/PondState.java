@@ -1,5 +1,6 @@
 package de.essen_sie_ihre_toten.pond_simulator_2020.pond;
 
+import de.essen_sie_ihre_toten.pond_simulator_2020.entities.WaterLily.WaterLily;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.Duck;
 import de.essen_sie_ihre_toten.pond_simulator_2020.hud.HUD;
 
@@ -30,6 +31,7 @@ public class PondState extends BasicGameState {
     private TiledMap map;
     private HUD hud;
     private List<Duck> ducks;
+    private List<WaterLily> waterLilies;
     private static List<Integer> entDeathList;
 
     private Music bgMusic;
@@ -56,7 +58,7 @@ public class PondState extends BasicGameState {
         // Load HUD
         this.hud = new HUD();
 
-        // Init ducks
+        // Init entities
         this.ducks = new ArrayList<>(
             Arrays.asList(
                 new Duck(200, 200),
@@ -66,13 +68,25 @@ public class PondState extends BasicGameState {
             )
         );
 
+        this.waterLilies = new ArrayList<>(
+            Arrays.asList(
+                new WaterLily(),
+                new WaterLily(),
+                new WaterLily(),
+                new WaterLily(),
+                new WaterLily(),
+                new WaterLily()
+            )
+        );
+
         entDeathList = new ArrayList<>();
 
         // Load spritesheets
         try {
             Duck.loadSprites();
+            WaterLily.loadSprites();
         } catch (SlickException sE) {
-            System.err.println("Error while loading sprites:\n" + sE.getMessage() + "\n" + sE.getCause());
+            sE.printStackTrace();
         }
 
         // Load musics
@@ -88,44 +102,21 @@ public class PondState extends BasicGameState {
 
     @Override
     public void render(GameContainer container, StateBasedGame game, Graphics graphics) {
-        if (this.isEnd) {
-            graphics.setColor(new Color(0, 0, 0));
-            graphics.fillRect(0, 0, container.getWidth(), container.getHeight());
-
-            String message = "C'est la fin";
-            String message2 = "Tous les canards sont morts";
-            String message3 = "Qu'ils reposent en canards laques ;(";
-
-            endTtf.drawString(
-                    ((float) container.getWidth() / 2) - ((float) endTtf.getWidth(message) / 2),
-                    (((float) container.getHeight() / 2) - ((float) endTtf.getHeight(message) / 2)) - 50,
-                    message
-            );
-
-            endTtf.drawString(
-                    ((float) container.getWidth() / 2) - ((float) endTtf.getWidth(message2) / 2),
-                    ((float) container.getHeight() / 2) - ((float) endTtf.getHeight(message2) / 2),
-                    message2
-            );
-
-            endTtf.drawString(
-                    ((float) container.getWidth() / 2) - ((float) endTtf.getWidth(message3) / 2),
-                    (((float) container.getHeight() / 2) - ((float) endTtf.getHeight(message3) / 2)) + 50,
-                    message3
-            );
-
-            return;
-        }
+        if (this.isEnd) { renderEnd(graphics); return; }
 
         // Normal level of the map
         this.map.render(0, 0, this.map.getLayerIndex("Pond"));
 
-        // Ducks
+        // Entities
+        for (WaterLily waterLily : this.waterLilies) {
+            waterLily.render(graphics);
+        }
+
         for (Duck duck : this.ducks) {
             duck.render(graphics);
         }
 
-        // Map layers in front of ducks
+        // Map layers in front of entities
         this.map.render(0, 0, this.map.getLayerIndex("aboveEntities"));
 
         // HUD
@@ -133,6 +124,10 @@ public class PondState extends BasicGameState {
 
         // Debug
         if (this.debug) {
+            for (WaterLily waterLily : this.waterLilies) {
+                waterLily.renderDebug();
+            }
+
             for (Duck duck : this.ducks) {
                 duck.renderDebug();
             }
@@ -150,7 +145,8 @@ public class PondState extends BasicGameState {
 
         // Delete dead entities
         if (entDeathList.size() > 0) {
-            this.ducks.removeIf(duck -> entDeathList.contains(duck.getId()));
+            this.ducks.removeIf(ent -> entDeathList.contains(ent.getId()));
+            this.waterLilies.removeIf(ent -> entDeathList.contains(ent.getId()));
 
             // Update ducks count
             int ducksCount = this.ducks.size();
@@ -218,5 +214,33 @@ public class PondState extends BasicGameState {
         endTtf.getEffects().add(new ColorEffect(java.awt.Color.white));
         endTtf.addAsciiGlyphs();
         endTtf.loadGlyphs();
+    }
+
+    // Others
+    private void renderEnd(Graphics graphics) {
+        graphics.setColor(new Color(0, 0, 0));
+        graphics.fillRect(0, 0, container.getWidth(), container.getHeight());
+
+        String message = "C'est la fin";
+        String message2 = "Tous les canards sont morts";
+        String message3 = "Qu'ils reposent en canards laques ;(";
+
+        endTtf.drawString(
+                ((float) container.getWidth() / 2) - ((float) endTtf.getWidth(message) / 2),
+                (((float) container.getHeight() / 2) - ((float) endTtf.getHeight(message) / 2)) - 50,
+                message
+        );
+
+        endTtf.drawString(
+                ((float) container.getWidth() / 2) - ((float) endTtf.getWidth(message2) / 2),
+                ((float) container.getHeight() / 2) - ((float) endTtf.getHeight(message2) / 2),
+                message2
+        );
+
+        endTtf.drawString(
+                ((float) container.getWidth() / 2) - ((float) endTtf.getWidth(message3) / 2),
+                (((float) container.getHeight() / 2) - ((float) endTtf.getHeight(message3) / 2)) + 50,
+                message3
+        );
     }
 }

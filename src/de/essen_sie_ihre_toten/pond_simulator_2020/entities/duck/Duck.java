@@ -1,5 +1,6 @@
 package de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck;
 
+import de.essen_sie_ihre_toten.pond_simulator_2020.entities.Entity;
 import de.essen_sie_ihre_toten.pond_simulator_2020.pond.PondState;
 
 import org.newdawn.slick.*;
@@ -7,16 +8,12 @@ import org.newdawn.slick.tiled.TiledMap;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Duck {
+public class Duck extends Entity {
     // Attributes
     private static int ducksCount;
-    private int id;
 
-    private float x;
-    private float y;
     private float targetX;
     private float targetY;
-    private int dir;
     private float speed;
     private boolean isMoving;
 
@@ -25,18 +22,14 @@ public class Duck {
     private boolean isDead;
     private float deathTimer;
 
-    private static Animation[] animations = new Animation[9];
+    private static Animation[] animations;
 
     // Constructors
     public Duck() {
-        ducksCount++;
-        this.id = ducksCount;
+        super();
 
-        this.x = 300;
-        this.y = 300;
         this.targetX = this.x;
         this.targetY = this.y;
-        this.dir = 1;
         this.speed = 0.2f;
         this.isMoving = false;
 
@@ -44,17 +37,15 @@ public class Duck {
         this.fp = 100;
         this.isDead = false;
         this.deathTimer = 0;
+
+        animations = new Animation[9];
     }
 
     public Duck(float x, float y) {
-        ducksCount++;
-        this.id = ducksCount;
+        super(x, y);
 
-        this.x = x;
-        this.y = y;
         this.targetX = this.x;
         this.targetY = this.y;
-        this.dir = 1;
         this.speed = 0.2f;
         this.isMoving = false;
 
@@ -62,37 +53,31 @@ public class Duck {
         this.fp = 100;
         this.isDead = false;
         this.deathTimer = 0;
+
+        animations = new Animation[9];
     }
 
     // Getters
     public static int getDucksCount()   { return ducksCount; }
-    public int getId()                  { return this.id; }
-    public float getX()                 { return this.x; }
-    public float getY()                 { return this.y; }
     public float getTargetX()           { return this.targetX; }
     public float getTargetY()           { return this.targetY; }
-    public int getDir()                 { return this.dir; }
     public float getSpeed()             { return this.speed; }
     public boolean isMoving()           { return this.isMoving; }
     public float getHp()                { return this.hp; }
     public float getFp()                { return this.fp; }
     public boolean isDead()             { return this.isDead; }
     public float getDeathTimer()        { return this.deathTimer; }
-    public Animation[] getAnimations()  { return animations; }
 
     // Setters
-    public static void setDucksCount(int count)         { ducksCount = count; }
-    public void setX(float x)                           { this.x = x; }
-    public void setY(float y)                           { this.y = y; }
-    public void setTargetX(float targetX)               { this.targetX = targetX; }
-    public void setTargetY(float targetY)               { this.targetY = targetY; }
-    public void setDir(int dir)                         { this.dir = dir; }
-    public void setSpeed(float speed)                   { this.speed = speed; }
-    public void setMoving(boolean isMoving)             { this.isMoving = isMoving; }
-    public void setHp(float hp)                         { this.hp = hp; }
-    public void setFp(float fp)                         { this.fp = fp; }
-    public void setDead(boolean isDead)                 { this.isDead = isDead; }
-    public void setDeathTimer(float deathTimer)         { this.deathTimer = deathTimer; }
+    public void setTargetX(float targetX)       { this.targetX = targetX; }
+    public void setTargetY(float targetY)       { this.targetY = targetY; }
+    public void setSpeed(float speed)           { this.speed = speed; }
+    public void setMoving(boolean isMoving)     { this.isMoving = isMoving; }
+    public void setHp(float hp)                 { this.hp = hp; }
+    public void setFp(float fp)                 { this.fp = fp; }
+    public void setDead(boolean isDead)         { this.isDead = isDead; }
+    public void setDeathTimer(float deathTimer) { this.deathTimer = deathTimer; }
+    public static void setDucksCount(int count) { ducksCount = count; }
 
     // Methods
     // Rendering
@@ -115,16 +100,6 @@ public class Duck {
         animations[8] = loadAnimation(spriteSheet, 0, 5, 4);
     }
 
-    private static Animation loadAnimation(SpriteSheet spriteSheet, int startX, int endX, int y) {
-        Animation animation = new Animation();
-
-        for (int x = startX; x < endX; x++) {
-            animation.addFrame(spriteSheet.getSprite(x, y), 100);
-        }
-
-        return animation;
-    }
-
     public void render(Graphics graphics) {
         if (!this.isDead) {
             // Shadow
@@ -137,17 +112,6 @@ public class Duck {
             graphics.drawAnimation(animations[8], this.x - 16, this.y - 32);
         }
 
-    }
-
-    public void renderDebug() {
-        String[] lines = this.toString().split("\n");
-        float textX = this.x - 40;
-        float textY = this.y;
-
-        for (String line : lines) {
-            PondState.debugTtf.drawString(textX, textY, line, Color.white);
-            textY += 14;
-        }
     }
 
     // Update
@@ -205,29 +169,6 @@ public class Duck {
         this.isMoving = true;
     }
 
-    private boolean isEnteringCollision(TiledMap map, float nextX, float nextY) {
-        Image solidTile = map.getTileImage(
-                (int) nextX / map.getTileWidth(),
-                (int) nextY / map.getTileHeight(),
-                map.getLayerIndex("Collisions")
-        );
-
-        boolean collision = solidTile != null;
-
-        if (collision) {
-
-            // Still collide if this is not a transparent pixel
-            Color color = solidTile.getColor(
-                    (int) nextX % map.getTileWidth(),
-                    (int) nextY % map.getTileHeight()
-            );
-
-            collision = color.getAlpha() > 0;
-        }
-
-        return collision;
-    }
-
     private void getMoveDir() {
         float absX = Math.abs(this.targetX);
         float absY = Math.abs(this.targetY);
@@ -260,7 +201,6 @@ public class Duck {
     }
 
     // Others
-    @Override
     public String toString() {
         return "Duck n°" + this.id + ":\n" +
                 "x: " + Math.round(this.x) + "px\n" +
