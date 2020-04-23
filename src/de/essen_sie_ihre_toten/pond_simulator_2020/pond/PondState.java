@@ -1,5 +1,6 @@
 package de.essen_sie_ihre_toten.pond_simulator_2020.pond;
 
+import de.essen_sie_ihre_toten.pond_simulator_2020.entities.Entity;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.WaterLily.WaterLily;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.Duck;
 import de.essen_sie_ihre_toten.pond_simulator_2020.hud.HUD;
@@ -32,7 +33,6 @@ public class PondState extends BasicGameState {
     private HUD hud;
     private List<Duck> ducks;
     private List<WaterLily> waterLilies;
-    private static List<Integer> entDeathList;
 
     private Music bgMusic;
 
@@ -78,8 +78,6 @@ public class PondState extends BasicGameState {
                 new WaterLily()
             )
         );
-
-        entDeathList = new ArrayList<>();
 
         // Load spritesheets
         try {
@@ -144,9 +142,9 @@ public class PondState extends BasicGameState {
         }
 
         // Delete dead entities
-        if (entDeathList.size() > 0) {
-            this.ducks.removeIf(ent -> entDeathList.contains(ent.getId()));
-            this.waterLilies.removeIf(ent -> entDeathList.contains(ent.getId()));
+        if (Entity.deadListNotEmpty()) {
+            this.ducks.removeIf(ent -> Entity.getDeathList().contains(ent.getId()));
+            this.waterLilies.removeIf(ent -> Entity.getDeathList().contains(ent.getId()));
 
             // Update ducks count
             int ducksCount = this.ducks.size();
@@ -164,12 +162,6 @@ public class PondState extends BasicGameState {
         if (Input.KEY_D == key)             { this.debug = !this.debug; this.container.setShowFPS(this.debug); }
         // Exit game with ESC
         else if (Input.KEY_ESCAPE == key)   { this.container.exit(); }
-    }
-
-    // Entities
-    public static void addToDeathList(int id) {
-        if (!entDeathList.contains(id))
-            entDeathList.add(id);
     }
 
     // Musics

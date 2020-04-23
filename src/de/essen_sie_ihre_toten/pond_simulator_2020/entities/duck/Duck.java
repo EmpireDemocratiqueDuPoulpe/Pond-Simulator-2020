@@ -1,7 +1,6 @@
 package de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck;
 
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.Entity;
-import de.essen_sie_ihre_toten.pond_simulator_2020.pond.PondState;
 
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
@@ -28,6 +27,8 @@ public class Duck extends Entity {
     public Duck() {
         super();
 
+        ducksCount++;
+
         this.targetX = this.x;
         this.targetY = this.y;
         this.speed = 0.2f;
@@ -43,6 +44,8 @@ public class Duck extends Entity {
 
     public Duck(float x, float y) {
         super(x, y);
+
+        ducksCount++;
 
         this.targetX = this.x;
         this.targetY = this.y;
@@ -123,7 +126,7 @@ public class Duck extends Entity {
             this.deathTimer += .01f * delta;
 
             if (this.deathTimer > 5) {
-                PondState.addToDeathList(this.id);
+                addToDeathList(this.id);
             }
         }
     }
