@@ -67,7 +67,7 @@ public abstract class Entity {
 
     // Methods
     // Rendering
-    public static void loadSprites() {}
+    public static void loadSprites() throws SlickException {}
     protected static Animation loadAnimation(SpriteSheet spriteSheet, int startX, int endX, int y) {
         Animation animation = new Animation();
 
