@@ -136,9 +136,13 @@ public class PondState extends BasicGameState {
     public void update(GameContainer container, StateBasedGame game, int delta) {
         if (this.isEnd) return;
 
-        // Update ducks
+        // Update entities
+        for (WaterLily waterLily : this.waterLilies) {
+            waterLily.update();
+        }
+
         for (Duck duck : this.ducks) {
-            duck.update(map, delta);
+            duck.update(map, waterLilies, delta);
         }
 
         // Delete dead entities

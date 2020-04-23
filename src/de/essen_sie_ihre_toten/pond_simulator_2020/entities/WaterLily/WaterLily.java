@@ -14,7 +14,7 @@ public class WaterLily extends Entity {
     public WaterLily() {
         super();
 
-        this.fp = 50;
+        this.fp = 90;
 
         animations = new Animation[4];
     }
@@ -22,7 +22,7 @@ public class WaterLily extends Entity {
     public WaterLily(float x, float y) {
         super(x, y);
 
-        this.fp = 50;
+        this.fp = 90;
 
         animations = new Animation[4];
     }
@@ -30,7 +30,7 @@ public class WaterLily extends Entity {
     public WaterLily(float x, float y, int dir) {
         super(x, y, dir);
 
-        this.fp = 50;
+        this.fp = 90;
 
         animations = new Animation[4];
     }
@@ -63,6 +63,11 @@ public class WaterLily extends Entity {
 
     public void render(Graphics graphics) {
         graphics.drawAnimation(animations[this.dir], this.x -16, this.y - 32);
+    }
+
+    // Update
+    public void update() {
+        if (this.fp <= 0) { Entity.addToDeathList(this.id); }
     }
 
     // Others

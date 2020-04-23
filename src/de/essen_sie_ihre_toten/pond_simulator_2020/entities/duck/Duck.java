@@ -2,9 +2,11 @@ package de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck;
 
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.Entity;
 
+import de.essen_sie_ihre_toten.pond_simulator_2020.entities.WaterLily.WaterLily;
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Duck extends Entity {
@@ -18,6 +20,7 @@ public class Duck extends Entity {
 
     private float hp;
     private float fp;
+    private float eatCooldown;
     private boolean isDead;
     private float deathTimer;
 
@@ -36,6 +39,7 @@ public class Duck extends Entity {
 
         this.hp = 100;
         this.fp = 100;
+        this.eatCooldown = .0f;
         this.isDead = false;
         this.deathTimer = 0;
 
@@ -54,6 +58,7 @@ public class Duck extends Entity {
 
         this.hp = 100;
         this.fp = 100;
+        this.eatCooldown = .0f;
         this.isDead = false;
         this.deathTimer = 0;
 
@@ -68,6 +73,7 @@ public class Duck extends Entity {
     public boolean isMoving()           { return this.isMoving; }
     public float getHp()                { return this.hp; }
     public float getFp()                { return this.fp; }
+    public float getEatCooldown()       { return this.eatCooldown; }
     public boolean isDead()             { return this.isDead; }
     public float getDeathTimer()        { return this.deathTimer; }
 
@@ -78,6 +84,7 @@ public class Duck extends Entity {
     public void setMoving(boolean isMoving)     { this.isMoving = isMoving; }
     public void setHp(float hp)                 { this.hp = hp; }
     public void setFp(float fp)                 { this.fp = fp; }
+    public void setEatCooldown(float cooldown)  { this.eatCooldown = cooldown; }
     public void setDead(boolean isDead)         { this.isDead = isDead; }
     public void setDeathTimer(float deathTimer) { this.deathTimer = deathTimer; }
     public static void setDucksCount(int count) { ducksCount = count; }
@@ -107,7 +114,7 @@ public class Duck extends Entity {
         if (!this.isDead) {
             // Shadow
             graphics.setColor(new Color(0, 0, 0, .5f));
-            graphics.fillOval(x - 16, y - 8, 32, 16);
+            graphics.fillOval(this.x - 16, this.y - 8, 32, 16);
 
             // Duck
             graphics.drawAnimation(animations[this.dir + (this.isMoving ? 4 : 0)], this.x - 16, this.y - 32);
@@ -118,10 +125,11 @@ public class Duck extends Entity {
     }
 
     // Update
-    public void update(TiledMap map, int delta) {
+    public void update(TiledMap map, List<WaterLily> waterLilies, int delta) {
         if (!this.isDead) {
             move(map, delta);
             loseFoodPoint(delta);
+            eat(waterLilies, delta);
         } else {
             this.deathTimer += .01f * delta;
 
@@ -203,6 +211,35 @@ public class Duck extends Entity {
         }
     }
 
+    private void eat(List<WaterLily> waterLilies, int delta) {
+        if (this.eatCooldown > .0f) {
+            this.eatCooldown -= .01f * delta;
+            return;
+        }
+
+        for (WaterLily waterLily : waterLilies) {
+            float wX = waterLily.getX();
+            float wY = waterLily.getY();
+            int wWidth = 64;
+            int wHeight = 64;
+            int margin = 25;
+
+            if (
+                    (this.x >= wX - margin && this.x <= wX + wWidth + margin) &&
+                    (this.y >= wY - margin && this.y <= wY + wHeight + margin)
+            ) {
+                // Add food point
+                float givenFp = Math.min(30, waterLily.getFp());
+
+                this.fp = Math.min(100, this.fp + givenFp);
+                waterLily.setFp(waterLily.getFp() - givenFp);
+
+                // Set cooldown
+                this.eatCooldown = 10;
+            }
+        }
+    }
+
     // Others
     public String toString() {
         return "Duck n°" + this.id + ":\n" +
@@ -214,6 +251,7 @@ public class Duck extends Entity {
                 "isMoving: " + this.isMoving + "\n" +
                 "HP: " + Math.round(this.hp) + "\n" +
                 "FP: " + Math.round(this.fp) + "\n" +
+                "eatCooldown: " + Math.round(this.eatCooldown) + "\n" +
                 "isDead: " + this.isDead;
     }
 }
