@@ -6,6 +6,7 @@ import de.essen_sie_ihre_toten.pond_simulator_2020.entities.WaterLily.WaterLily;
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -24,7 +25,7 @@ public class Duck extends Entity {
     private boolean isDead;
     private float deathTimer;
 
-    private static Animation[] animations;
+    private static Animation[] animations = new Animation[9];
 
     // Constructors
     public Duck() {
@@ -42,8 +43,6 @@ public class Duck extends Entity {
         this.eatCooldown = .0f;
         this.isDead = false;
         this.deathTimer = 0;
-
-        animations = new Animation[9];
     }
 
     public Duck(float x, float y) {
@@ -61,8 +60,6 @@ public class Duck extends Entity {
         this.eatCooldown = .0f;
         this.isDead = false;
         this.deathTimer = 0;
-
-        animations = new Animation[9];
     }
 
     // Getters
@@ -108,6 +105,7 @@ public class Duck extends Entity {
 
         // Die
         animations[8] = loadAnimation(spriteSheet, 0, 5, 4);
+        animations[8].setLooping(false);
     }
 
     public void render(Graphics graphics) {
@@ -135,6 +133,9 @@ public class Duck extends Entity {
 
             if (this.deathTimer > 5) {
                 addToDeathList(this.id);
+
+                // Reset death anim
+                animations[8].restart();
             }
         }
     }

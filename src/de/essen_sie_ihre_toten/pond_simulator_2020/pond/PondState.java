@@ -61,17 +61,15 @@ public class PondState extends BasicGameState {
         // Init entities
         this.ducks = new ArrayList<>(
             Arrays.asList(
-                new Duck(200, 200),
-                new Duck(200, 200),
-                new Duck(200, 200),
-                new Duck(200, 200)
+                new Duck(),
+                new Duck(),
+                new Duck(),
+                new Duck()
             )
         );
 
         this.waterLilies = new ArrayList<>(
             Arrays.asList(
-                new WaterLily(),
-                new WaterLily(),
                 new WaterLily(),
                 new WaterLily(),
                 new WaterLily(),
@@ -135,6 +133,14 @@ public class PondState extends BasicGameState {
     @Override
     public void update(GameContainer container, StateBasedGame game, int delta) {
         if (this.isEnd) return;
+
+        // Add new entities
+        if ((Math.random() * (100)) <= .01f)
+            this.waterLilies.add(new WaterLily());
+
+        if (Duck.getDucksCount() >= 2)
+            if ((Math.random() * (100)) <= .01f)
+                this.ducks.add(new Duck());
 
         // Update entities
         for (WaterLily waterLily : this.waterLilies) {

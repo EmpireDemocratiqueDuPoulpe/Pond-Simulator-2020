@@ -8,39 +8,31 @@ public class WaterLily extends Entity {
     // Attributes
     private float fp;
 
-    private static Animation[] animations;
+    private static Animation[] animations = new Animation[4];
 
     // Constructors
     public WaterLily() {
         super();
 
         this.fp = 90;
-
-        animations = new Animation[4];
     }
 
     public WaterLily(float x, float y) {
         super(x, y);
 
         this.fp = 90;
-
-        animations = new Animation[4];
     }
 
     public WaterLily(float x, float y, int dir) {
         super(x, y, dir);
 
         this.fp = 90;
-
-        animations = new Animation[4];
     }
 
     public WaterLily(float x, float y, int dir, float fp) {
         super(x, y, dir);
 
         this.fp = fp;
-
-        animations = new Animation[4];
     }
 
     // Getters

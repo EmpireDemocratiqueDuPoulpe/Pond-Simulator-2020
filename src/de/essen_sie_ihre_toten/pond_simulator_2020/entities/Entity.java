@@ -78,7 +78,7 @@ public abstract class Entity {
         return animation;
     }
 
-    public void render(Graphics graphics) {}
+    public void render() {}
     public void renderDebug() {
         String[] lines = this.toString().split("\n");
         float textX = this.x - 40;
@@ -91,7 +91,7 @@ public abstract class Entity {
     }
 
     // Update
-    public void update(TiledMap map, int delta) {}
+    public void update() {}
 
     // Movement
     protected boolean isEnteringCollision(TiledMap map, float nextX, float nextY) {
