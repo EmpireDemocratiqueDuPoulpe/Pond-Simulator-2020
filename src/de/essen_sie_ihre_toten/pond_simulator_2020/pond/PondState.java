@@ -135,7 +135,7 @@ public class PondState extends BasicGameState {
         if (this.isEnd) return;
 
         // Add new entities
-        if ((Math.random() * (100)) <= .01f)
+        if ((Math.random() * (100)) <= .06f)
             this.waterLilies.add(new WaterLily());
 
         if (Duck.getDucksCount() >= 2)
