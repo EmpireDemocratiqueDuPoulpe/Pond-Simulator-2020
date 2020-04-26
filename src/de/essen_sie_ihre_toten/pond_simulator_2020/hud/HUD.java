@@ -1,5 +1,7 @@
 package de.essen_sie_ihre_toten.pond_simulator_2020.hud;
 
+import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.BaseDuck;
+import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.CaptainDuck;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.Duck;
 import de.essen_sie_ihre_toten.pond_simulator_2020.pond.PondState;
 
@@ -19,6 +21,7 @@ public class HUD {
 
         this.keys = new HashMap<>() {
             {
+                put("No food", new Image("./src/resources/keys/key_f.png"));
                 put("Quitter", new Image("./src/resources/keys/key_esc.png"));
                 put("Debug", new Image("./src/resources/keys/key_d.png"));
             }
@@ -36,7 +39,7 @@ public class HUD {
 
     private void drawDucksCount(Graphics graphics) {
         graphics.drawImage(this.ducksCount, 10, 10);
-        PondState.hudTtf.drawString(12 + ducksCount.getWidth(), 14, ": " + Duck.getDucksCount(), Color.white);
+        PondState.hudTtf.drawString(12 + ducksCount.getWidth(), 14, ": " + (Duck.getDucksCount() + CaptainDuck.getDucksCount()), Color.white);
     }
 
     private void drawKeys(GameContainer container, Graphics graphics) {
@@ -45,15 +48,22 @@ public class HUD {
         int keyDX = containerWidth - keyBoxSize;
         int keyDY = 10;
 
+        // Black box behind
         graphics.setColor(new Color(0, 0, 0, .5f));
         graphics.fillRect(keyDX - 10, 0, keyBoxSize + 10, (this.keys.size() * 42) + 8);
 
         for(Map.Entry<String, Image> key : this.keys.entrySet()) {
             String name = key.getKey();
             Image image = key.getValue();
+            Color color = Color.white;
 
+            // Change color if the key is activated
+            if (name.equals("Debug") && PondState.debugActivated()) { color = Color.yellow; }
+            else if (name.equals("No food") && !BaseDuck.canEat())  { color = Color.yellow; }
+
+            // Draw the key
             graphics.drawImage(image, keyDX, keyDY);
-            PondState.hudTtf.drawString(keyDX + 42, keyDY + 8, name, Color.white);
+            PondState.hudTtf.drawString(keyDX + 42, keyDY + 8, name, color);
 
             keyDY += 40;
         }

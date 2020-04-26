@@ -30,7 +30,7 @@ public class PondState extends BasicGameState {
     private GameContainer container;
     private StateBasedGame game;
     private boolean isEnd;
-    private boolean debug;
+    private static boolean debug;
 
     private TiledMap map;
     private HUD hud;
@@ -44,7 +44,8 @@ public class PondState extends BasicGameState {
     public static UnicodeFont endTtf;
 
     // Getters
-    public int getID() { return ID; }
+    public int getID()                      { return ID; }
+    public static boolean debugActivated()  { return debug; }
 
     // Methods
     // Slick2D
@@ -53,7 +54,7 @@ public class PondState extends BasicGameState {
         this.container = container;
         this.game = game;
         this.isEnd = false;
-        this.debug = false;
+        debug = false;
 
         // Load map
         this.map = new TiledMap("resources/maps/pond.tmx");
@@ -71,10 +72,6 @@ public class PondState extends BasicGameState {
             )
         );
 
-        BaseDuck tmp = this.ducks.get(0);
-        tmp.setWeight(28);
-        this.ducks.set(0, tmp);
-
         this.waterLilies = new ArrayList<>(
             Arrays.asList(
                 new WaterLily(),
@@ -84,24 +81,22 @@ public class PondState extends BasicGameState {
             )
         );
 
-        // Load spritesheets
+        // Load spritesheets, sounds and fonts
         try {
+            // Sprites
             Duck.loadSprites();
             CaptainDuck.loadSprites();
 
             WaterLily.loadSprites();
-        } catch (SlickException sE) {
-            sE.printStackTrace();
-        }
 
-        // Load musics
-        loadMusics();
+            // Sounds
+            loadMusics();
+            BaseDuck.loadSounds();
 
-        // Load fonts
-        try {
+            // Fonts
             loadFonts();
-        } catch (FontFormatException | IOException | SlickException e) {
-            e.printStackTrace();
+        } catch (FontFormatException | IOException | SlickException sE) {
+            sE.printStackTrace();
         }
     }
 
@@ -128,7 +123,7 @@ public class PondState extends BasicGameState {
         this.hud.render(container, graphics);
 
         // Debug
-        if (this.debug) {
+        if (debug) {
             for (WaterLily waterLily : this.waterLilies) {
                 waterLily.renderDebug();
             }
@@ -162,7 +157,7 @@ public class PondState extends BasicGameState {
 
         // Convert ducks to CaptainDuck
         this.ducks = ducks.stream()
-            .map(duck -> ((duck.getWeight() >= 10) && !(duck instanceof CaptainDuck)) ? new CaptainDuck(duck) : duck)
+            .map(duck -> ((duck.getWeight() >= 10) && !(duck instanceof CaptainDuck) && (CaptainDuck.getDucksCount() < 3)) ? new CaptainDuck(duck) : duck)
             .collect(Collectors.toList());
 
         // Delete dead entities
@@ -171,25 +166,30 @@ public class PondState extends BasicGameState {
             this.waterLilies.removeIf(ent -> Entity.getDeathList().contains(ent.getId()));
 
             // Update ducks count
-            int ducksCount = this.ducks.size();
+            int ducksCount = (int) this.ducks.stream().filter(duck -> duck instanceof Duck).count();
+            int captainDucksCount = (int) this.ducks.stream().filter(duck -> duck instanceof CaptainDuck).count();
 
-            if (ducksCount == 0)
+            if ((ducksCount + captainDucksCount) == 0)
                 this.isEnd = true;
-            else
+            else {
                 Duck.setDucksCount(ducksCount);
+                CaptainDuck.setDucksCount(captainDucksCount);
+            }
         }
     }
 
     @Override
     public void keyReleased(int key, char c) {
         // Activate debug
-        if (Input.KEY_D == key)             { this.debug = !this.debug; this.container.setShowFPS(this.debug); }
+        if (Input.KEY_D == key)             { debug = !debug; this.container.setShowFPS(debug); }
+        // Prevent ducks from eating
+        else if (Input.KEY_F == key)        { BaseDuck.setCanEat(!BaseDuck.canEat()); }
         // Exit game with ESC
         else if (Input.KEY_ESCAPE == key)   { this.container.exit(); }
     }
 
     // Musics
-    private void loadMusics() {
+    private void loadMusics() throws SlickException {
         /*File[] files = folder.listFiles();
 
         if (files != null) {
@@ -202,14 +202,10 @@ public class PondState extends BasicGameState {
             }
         }*/
 
-        try {
-            this.bgMusic = new Music("resources/musics/m1.ogg");
-            this.bgMusic.loop();
-            this.bgMusic.setVolume(0.3f);
-        } catch (SlickException sE) {
-            sE.printStackTrace();
-        }
-
+        // Background music
+        this.bgMusic = new Music("resources/musics/m1.ogg");
+        this.bgMusic.loop();
+        this.bgMusic.setVolume(0.5f);
     }
 
     // Fonts
