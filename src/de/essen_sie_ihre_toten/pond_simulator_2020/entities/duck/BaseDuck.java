@@ -12,8 +12,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class BaseDuck extends Entity {
     // Attributes
-    private static int ducksCount;
-
     private float targetX;
     private float targetY;
     private float speed;
@@ -22,16 +20,19 @@ public abstract class BaseDuck extends Entity {
     private float hp;
     private float fp;
     private int weight;
+    private static boolean canEat = true;
     private float eatCooldown;
     private boolean isDead;
     private boolean isOverweight;
     private float deathTimer;
 
+    private static Sound explode;
+    private static Sound dying;
+    private boolean isPlayingSound;
+
     // Constructors
     public BaseDuck() {
         super();
-
-        ducksCount++;
 
         this.targetX = this.x;
         this.targetY = this.y;
@@ -45,13 +46,13 @@ public abstract class BaseDuck extends Entity {
         this.isDead = false;
         this.isOverweight = false;
         this.deathTimer = 0;
+
+        this.isPlayingSound = false;
     }
 
     public BaseDuck(float x, float y) {
         super(x, y);
 
-        ducksCount++;
-
         this.targetX = this.x;
         this.targetY = this.y;
         this.speed = 0.2f;
@@ -64,12 +65,12 @@ public abstract class BaseDuck extends Entity {
         this.isDead = false;
         this.isOverweight = false;
         this.deathTimer = 0;
+
+        this.isPlayingSound = false;
     }
 
     public BaseDuck(BaseDuck duck) {
         super(duck.getX(), duck.getY());
-
-        ducksCount++;
 
         this.targetX = duck.getTargetX();
         this.targetY = duck.getTargetY();
@@ -83,10 +84,11 @@ public abstract class BaseDuck extends Entity {
         this.isDead = duck.isDead();
         this.isOverweight = duck.isOverweight();
         this.deathTimer = duck.getDeathTimer();
+
+        this.isPlayingSound = duck.isPlayingSound();
     }
 
     // Getters
-    public static int getDucksCount()   { return ducksCount; }
     public float getTargetX()           { return this.targetX; }
     public float getTargetY()           { return this.targetY; }
     public float getSpeed()             { return this.speed; }
@@ -94,10 +96,12 @@ public abstract class BaseDuck extends Entity {
     public float getHp()                { return this.hp; }
     public float getFp()                { return this.fp; }
     public int getWeight()              { return this.weight; }
+    public static boolean canEat()      { return canEat; }
     public float getEatCooldown()       { return this.eatCooldown; }
     public boolean isDead()             { return this.isDead; }
     public boolean isOverweight()       { return this.isOverweight; }
     public float getDeathTimer()        { return this.deathTimer; }
+    public boolean isPlayingSound()     { return this.isPlayingSound; }
     public abstract Animation[] getAnimations();
 
     // Setters
@@ -108,11 +112,12 @@ public abstract class BaseDuck extends Entity {
     public void setHp(float hp)                     { this.hp = Math.min(100, hp); }
     public void setFp(float fp)                     { this.fp = Math.min(100, fp); }
     public void setWeight(int weight)               { this.weight = weight; }
+    public static void setCanEat(boolean eat)       { canEat = eat; }
     public void setEatCooldown(float cooldown)      { this.eatCooldown = cooldown; }
     public void setDead(boolean isDead)             { this.isDead = isDead; }
     public void setOverweight(boolean isOverweight) { this.isOverweight = isOverweight; }
     public void setDeathTimer(float deathTimer)     { this.deathTimer = deathTimer; }
-    public static void setDucksCount(int count)     { ducksCount = count; }
+    public void setPlayingSound(boolean isPlaying)  { this.isPlayingSound = isPlaying; }
 
     // Methods
     // Rendering
@@ -137,6 +142,7 @@ public abstract class BaseDuck extends Entity {
 
         // Explosion
         animations[9] = loadAnimation(spriteSheet, 0, 6, 5);
+        animations[9].setLooping(false);
 
         return animations;
     }
@@ -171,7 +177,7 @@ public abstract class BaseDuck extends Entity {
         if (!this.isDead && !this.isOverweight) {
             move(map, delta);
             loseFoodPoint(delta);
-            eat(waterLilies, delta);
+            if (canEat) eat(waterLilies, delta);
         } else {
             this.deathTimer += .01f * delta;
 
@@ -180,8 +186,11 @@ public abstract class BaseDuck extends Entity {
 
                 // Reset death anim
                 getAnimations()[8].restart();
+                getAnimations()[9].restart();
             }
         }
+
+        playSounds();
     }
 
     // Movement
@@ -289,6 +298,23 @@ public abstract class BaseDuck extends Entity {
                 // Set cooldown
                 this.eatCooldown = 10;
             }
+        }
+    }
+
+    // Sounds
+    public static void loadSounds() throws SlickException {
+        explode = new Sound("resources/sounds/duck_explode.ogg");
+        dying = new Sound("resources/sounds/duck_drowning.ogg");
+    }
+
+    public void playSounds() {
+        // Play sound
+        if (!this.isPlayingSound) {
+            if (this.isOverweight) { explode.play(1.0f, 0.2f); this.isPlayingSound = true; } // Explode (overweight)
+            else if (this.isDead) { dying.play(1.0f, 0.2f);  this.isPlayingSound = true; } // Die (drowning)
+        // Check if there's no sound playing
+        } else if (!explode.playing() && !dying.playing()) {
+            this.isPlayingSound = false;
         }
     }
 
