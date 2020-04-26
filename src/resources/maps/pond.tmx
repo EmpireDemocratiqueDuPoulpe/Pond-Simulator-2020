@@ -8,12 +8,12 @@
  </tileset>
  <layer id="1" name="Pond" width="30" height="20" locked="1">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAACmNkYGBgHGDMhoaxyaOrw6Yfl7nY7OQBYlY0zIKGWZFobGrw6QNhPiz2MgOxMI0xBxZ7mehgL/sA+Xek2TtQ8YvN3oHy70DF70Dlo+Fs72CK35GWnoXoYC8/FntHCgYAn9DPy2AJAAA=
+   H4sIAAAAAAAACmNkYGBgHGDMhoaxyaOrw6Yfl7nY7OQBYlY0zIKGWZFobGrw6QNhPiz2MgOxMI0xBxZ7mehgL/sA+Xek2TtQ8YvN3oHy70DF70Dlo+Fs72CK35GWnhnoYC8DDnvpAQbaXgCy655hYAkAAA==
   </data>
  </layer>
  <layer id="4" name="aboveEntities" width="30" height="20" locked="1">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAACmNgGAWjYBSMglEwCkbBSANCQMwFxJxImAtNjAuPGDHy/HTzzeADAJlDrtZgCQAA
+   H4sIAAAAAAAACmNgGAWjYBSMglEwCkbBSANCQMwFxJxImAtNjAuPGDHy/FjsZaQTHmh7Afl1Od5gCQAA
   </data>
  </layer>
  <layer id="2" name="Collisions" width="30" height="20" visible="0" locked="1" opacity="0.4">
