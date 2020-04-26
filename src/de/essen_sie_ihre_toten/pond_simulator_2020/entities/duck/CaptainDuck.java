@@ -6,7 +6,7 @@ import org.newdawn.slick.SpriteSheet;
 
 public class CaptainDuck extends BaseDuck {
     // Attributes
-    private static Animation[] animations = new Animation[9];
+    private static Animation[] animations = new Animation[10];
 
     // Constructors
     public CaptainDuck() {
@@ -18,20 +18,7 @@ public class CaptainDuck extends BaseDuck {
     }
 
     public CaptainDuck(BaseDuck duck) {
-        super(
-            duck.getX(),
-            duck.getY(),
-            duck.getTargetX(),
-            duck.getTargetY(),
-            duck.getSpeed(),
-            duck.isMoving(),
-            duck.getHp(),
-            duck.getFp(),
-            duck.getWeight(),
-            duck.getEatCooldown(),
-            duck.isDead(),
-            duck.getDeathTimer()
-        );
+        super(duck);
     }
 
     // Getters

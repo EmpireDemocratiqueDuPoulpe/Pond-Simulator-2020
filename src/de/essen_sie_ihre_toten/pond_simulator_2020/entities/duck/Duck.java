@@ -6,7 +6,7 @@ import org.newdawn.slick.SpriteSheet;
 
 public class Duck extends BaseDuck {
     // Attributes
-    private static Animation[] animations = new Animation[9];
+    private static Animation[] animations = new Animation[10];
 
     // Constructors
     public Duck() {

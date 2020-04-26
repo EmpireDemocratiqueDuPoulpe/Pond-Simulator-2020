@@ -71,6 +71,10 @@ public class PondState extends BasicGameState {
             )
         );
 
+        BaseDuck tmp = this.ducks.get(0);
+        tmp.setWeight(28);
+        this.ducks.set(0, tmp);
+
         this.waterLilies = new ArrayList<>(
             Arrays.asList(
                 new WaterLily(),

@@ -24,6 +24,7 @@ public abstract class BaseDuck extends Entity {
     private int weight;
     private float eatCooldown;
     private boolean isDead;
+    private boolean isOverweight;
     private float deathTimer;
 
     // Constructors
@@ -42,6 +43,7 @@ public abstract class BaseDuck extends Entity {
         this.weight = 0;
         this.eatCooldown = .0f;
         this.isDead = false;
+        this.isOverweight = false;
         this.deathTimer = 0;
     }
 
@@ -60,26 +62,27 @@ public abstract class BaseDuck extends Entity {
         this.weight = 0;
         this.eatCooldown = .0f;
         this.isDead = false;
+        this.isOverweight = false;
         this.deathTimer = 0;
     }
 
-    public BaseDuck(float x, float y, float targetX, float targetY, float speed, boolean isMoving,
-                    float hp, float fp, int weight, float eatCooldown, boolean isDead, float deathTimer) {
-        super(x, y);
+    public BaseDuck(BaseDuck duck) {
+        super(duck.getX(), duck.getY());
 
         ducksCount++;
 
-        this.targetX = targetX;
-        this.targetY = targetY;
-        this.speed = speed;
-        this.isMoving = isMoving;
+        this.targetX = duck.getTargetX();
+        this.targetY = duck.getTargetY();
+        this.speed = duck.getSpeed();
+        this.isMoving = duck.isMoving();
 
-        this.hp = hp;
-        this.fp = fp;
-        this.weight = weight;
-        this.eatCooldown = eatCooldown;
-        this.isDead = isDead;
-        this.deathTimer = deathTimer;
+        this.hp = duck.getHp();
+        this.fp = duck.getFp();
+        this.weight = duck.getWeight();
+        this.eatCooldown = duck.getEatCooldown();
+        this.isDead = duck.isDead();
+        this.isOverweight = duck.isOverweight();
+        this.deathTimer = duck.getDeathTimer();
     }
 
     // Getters
@@ -93,26 +96,28 @@ public abstract class BaseDuck extends Entity {
     public int getWeight()              { return this.weight; }
     public float getEatCooldown()       { return this.eatCooldown; }
     public boolean isDead()             { return this.isDead; }
+    public boolean isOverweight()       { return this.isOverweight; }
     public float getDeathTimer()        { return this.deathTimer; }
     public abstract Animation[] getAnimations();
 
     // Setters
-    public void setTargetX(float targetX)       { this.targetX = targetX; }
-    public void setTargetY(float targetY)       { this.targetY = targetY; }
-    public void setSpeed(float speed)           { this.speed = speed; }
-    public void setMoving(boolean isMoving)     { this.isMoving = isMoving; }
-    public void setHp(float hp)                 { this.hp = Math.min(100, hp); }
-    public void setFp(float fp)                 { this.fp = Math.min(100, fp); }
-    public void setWeight(int weight)           { this.weight = Math.min(10, weight); }
-    public void setEatCooldown(float cooldown)  { this.eatCooldown = cooldown; }
-    public void setDead(boolean isDead)         { this.isDead = isDead; }
-    public void setDeathTimer(float deathTimer) { this.deathTimer = deathTimer; }
-    public static void setDucksCount(int count) { ducksCount = count; }
+    public void setTargetX(float targetX)           { this.targetX = targetX; }
+    public void setTargetY(float targetY)           { this.targetY = targetY; }
+    public void setSpeed(float speed)               { this.speed = speed; }
+    public void setMoving(boolean isMoving)         { this.isMoving = isMoving; }
+    public void setHp(float hp)                     { this.hp = Math.min(100, hp); }
+    public void setFp(float fp)                     { this.fp = Math.min(100, fp); }
+    public void setWeight(int weight)               { this.weight = weight; }
+    public void setEatCooldown(float cooldown)      { this.eatCooldown = cooldown; }
+    public void setDead(boolean isDead)             { this.isDead = isDead; }
+    public void setOverweight(boolean isOverweight) { this.isOverweight = isOverweight; }
+    public void setDeathTimer(float deathTimer)     { this.deathTimer = deathTimer; }
+    public static void setDucksCount(int count)     { ducksCount = count; }
 
     // Methods
     // Rendering
     public static Animation[] loadSprites(SpriteSheet spriteSheet) {
-        Animation[] animations = new Animation[9];
+        Animation[] animations = new Animation[10];
 
         // Idle
         animations[0] = loadAnimation(spriteSheet, 0, 1, 0); // Up
@@ -130,6 +135,9 @@ public abstract class BaseDuck extends Entity {
         animations[8] = loadAnimation(spriteSheet, 0, 5, 4);
         animations[8].setLooping(false);
 
+        // Explosion
+        animations[9] = loadAnimation(spriteSheet, 0, 6, 5);
+
         return animations;
     }
 
@@ -141,7 +149,7 @@ public abstract class BaseDuck extends Entity {
 
         float size = 32 + growRatio;
 
-        if (!this.isDead) {
+        if (!this.isDead && !this.isOverweight) {
             // Shadow
             graphics.setColor(new Color(0, 0, 0, .5f));
             graphics.fillOval(originX, originY + 24, size, 16 + growRatio);
@@ -149,8 +157,10 @@ public abstract class BaseDuck extends Entity {
             // Duck
             //graphics.drawAnimation(getAnimations()[this.dir + (this.isMoving ? 4 : 0)], this.x - 16, this.y - 32);
             getAnimations()[this.dir + (this.isMoving ? 4 : 0)].draw(originX, originY, size, size);
-        } else {
+        } else if (this.isOverweight) {
             //graphics.drawAnimation(getAnimations()[8], originX, originY);
+            getAnimations()[9].draw(originX, originY, size, size);
+        } else {
             getAnimations()[8].draw(originX, originY, size, size);
         }
 
@@ -158,7 +168,7 @@ public abstract class BaseDuck extends Entity {
 
     // Update
     public void update(TiledMap map, List<WaterLily> waterLilies, int delta) {
-        if (!this.isDead) {
+        if (!this.isDead && !this.isOverweight) {
             move(map, delta);
             loseFoodPoint(delta);
             eat(waterLilies, delta);
@@ -239,10 +249,15 @@ public abstract class BaseDuck extends Entity {
             this.hp -= .01f * delta;
         }
 
+        // Check if the duck is overweight
+        if (this.weight >= 30) {
+            this.isOverweight = true;
+        }
+
         // Check if the duck is dead
         if (this.hp <= 0) {
             this.hp = 0;
-            this.isDead = true;
+            if (!this.isOverweight) this.isDead = true;
         }
     }
 
@@ -290,6 +305,7 @@ public abstract class BaseDuck extends Entity {
                 "FP: " + Math.round(this.fp) + "\n" +
                 "weight: " + this.weight + "\n" +
                 "eatCooldown: " + Math.round(this.eatCooldown) + "\n" +
-                "isDead: " + this.isDead;
+                "isDead: " + this.isDead + "\n" +
+                "isOverweight: " + this.isOverweight;
     }
 }
