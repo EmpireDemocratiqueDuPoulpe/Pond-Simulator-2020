@@ -2,6 +2,8 @@ package de.essen_sie_ihre_toten.pond_simulator_2020.pond;
 
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.Entity;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.WaterLily.WaterLily;
+import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.BaseDuck;
+import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.CaptainDuck;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.Duck;
 import de.essen_sie_ihre_toten.pond_simulator_2020.hud.HUD;
 
@@ -20,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PondState extends BasicGameState {
     // Attributes
@@ -31,7 +34,7 @@ public class PondState extends BasicGameState {
 
     private TiledMap map;
     private HUD hud;
-    private List<Duck> ducks;
+    private List<BaseDuck> ducks;
     private List<WaterLily> waterLilies;
 
     private Music bgMusic;
@@ -80,6 +83,8 @@ public class PondState extends BasicGameState {
         // Load spritesheets
         try {
             Duck.loadSprites();
+            CaptainDuck.loadSprites();
+
             WaterLily.loadSprites();
         } catch (SlickException sE) {
             sE.printStackTrace();
@@ -108,7 +113,7 @@ public class PondState extends BasicGameState {
             waterLily.render(graphics);
         }
 
-        for (Duck duck : this.ducks) {
+        for (BaseDuck duck : this.ducks) {
             duck.render(graphics);
         }
 
@@ -124,7 +129,7 @@ public class PondState extends BasicGameState {
                 waterLily.renderDebug();
             }
 
-            for (Duck duck : this.ducks) {
+            for (BaseDuck duck : this.ducks) {
                 duck.renderDebug();
             }
         }
@@ -147,9 +152,14 @@ public class PondState extends BasicGameState {
             waterLily.update();
         }
 
-        for (Duck duck : this.ducks) {
+        for (BaseDuck duck : this.ducks) {
             duck.update(map, waterLilies, delta);
         }
+
+        // Convert ducks to CaptainDuck
+        this.ducks = ducks.stream()
+            .map(duck -> ((duck.getWeight() >= 10) && !(duck instanceof CaptainDuck)) ? new CaptainDuck(duck) : duck)
+            .collect(Collectors.toList());
 
         // Delete dead entities
         if (Entity.deadListNotEmpty()) {
