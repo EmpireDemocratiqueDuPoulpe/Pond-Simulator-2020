@@ -6,19 +6,27 @@ import org.newdawn.slick.SpriteSheet;
 
 public class Duck extends BaseDuck {
     // Attributes
+    private static int ducksCount;
+
     private static Animation[] animations = new Animation[10];
 
     // Constructors
     public Duck() {
         super();
+        ducksCount++;
     }
 
     public Duck(float x, float y) {
         super(x, y);
+        ducksCount++;
     }
 
     // Getters
-    public Animation[] getAnimations() { return animations; }
+    public static int getDucksCount()          { return ducksCount; }
+    public Animation[] getAnimations()  { return animations; }
+
+    // Setters
+    public static void setDucksCount(int count) { ducksCount = count; }
 
     // Methods
     // Rendering
