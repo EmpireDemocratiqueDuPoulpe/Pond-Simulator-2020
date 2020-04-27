@@ -59,7 +59,13 @@ public class HUD {
             Color color = Color.white;
 
             // Change color if the key is activated
-            if (name.equals("Debug") && PondState.debugActivated()) { color = Color.yellow; }
+            if (name.equals("Debug") && PondState.debugActivated()) {
+                if (PondState.superDebugActivated())
+                    color = Color.red;
+
+                else
+                    color = Color.yellow;
+            }
             else if (name.equals("No food") && !BaseDuck.canEat())  { color = Color.yellow; }
 
             // Draw the key

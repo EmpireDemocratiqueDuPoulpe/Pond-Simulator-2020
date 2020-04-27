@@ -27,6 +27,7 @@ public class PondState extends BasicGameState {
     private StateBasedGame game;
     private boolean isEnd;
     private static boolean debug;
+    private static boolean superDebug;
 
     private TiledMap map;
     private HUD hud;
@@ -36,8 +37,9 @@ public class PondState extends BasicGameState {
     private Music bgMusic;
 
     // Getters
-    public int getID()                      { return ID; }
-    public static boolean debugActivated()  { return debug; }
+    public int getID()                          { return ID; }
+    public static boolean debugActivated()      { return debug; }
+    public static boolean superDebugActivated() { return superDebug; }
 
     // Methods
     // Slick2D
@@ -47,6 +49,7 @@ public class PondState extends BasicGameState {
         this.game = game;
         this.isEnd = false;
         debug = false;
+        superDebug = false;
 
         // Load map
         this.map = new TiledMap("resources/maps/pond.tmx");
@@ -114,11 +117,13 @@ public class PondState extends BasicGameState {
         // Debug
         if (debug) {
             for (WaterLily waterLily : this.waterLilies) {
-                waterLily.renderDebug();
+                waterLily.renderDebug(graphics);
+                if (superDebug) waterLily.renderSuperDebug(graphics);
             }
 
             for (BaseDuck duck : this.ducks) {
-                duck.renderDebug();
+                duck.renderDebug(graphics);
+                if (superDebug) duck.renderSuperDebug(graphics);
             }
         }
     }
@@ -170,7 +175,18 @@ public class PondState extends BasicGameState {
     @Override
     public void keyReleased(int key, char c) {
         // Activate debug
-        if (Input.KEY_D == key)             { debug = !debug; this.container.setShowFPS(debug); }
+        if (Input.KEY_D == key) {
+            if (!debug) {
+                debug = true;
+            } else if (!superDebug) {
+                superDebug = true;
+            } else {
+                debug = false;
+                superDebug = false;
+            }
+
+            this.container.setShowFPS(debug);
+        }
         // Prevent ducks from eating
         else if (Input.KEY_F == key)        { BaseDuck.setCanEat(!BaseDuck.canEat()); }
         // Exit game with ESC

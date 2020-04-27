@@ -3,6 +3,8 @@ package de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.Entity;
 
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.WaterLily.WaterLily;
+import de.essen_sie_ihre_toten.pond_simulator_2020.hud.Bar;
+import de.essen_sie_ihre_toten.pond_simulator_2020.main_menu.MainMenuState;
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
 
@@ -30,6 +32,10 @@ public abstract class BaseDuck extends Entity {
     private static Sound dying;
     private boolean isPlayingSound;
 
+    private Bar hpBar;
+    private Bar fpBar;
+    private Bar weightBar;
+
     // Constructors
     public BaseDuck() {
         super();
@@ -48,6 +54,10 @@ public abstract class BaseDuck extends Entity {
         this.deathTimer = 0;
 
         this.isPlayingSound = false;
+
+        this.hpBar = new Bar(this.x - 16, this.y - 54, 32, 3, this.hp, 100, Bar.darkGreen, Bar.green);
+        this.fpBar = new Bar(this.x - 16, this.y - 48, 32, 3, this.fp, 100, Bar.darkOrange, Bar.orange);
+        this.weightBar = new Bar(this.x - 16, this.y - 42, 32, 3, this.weight, 30, Bar.grey, Bar.white);
     }
 
     public BaseDuck(float x, float y) {
@@ -67,6 +77,10 @@ public abstract class BaseDuck extends Entity {
         this.deathTimer = 0;
 
         this.isPlayingSound = false;
+
+        this.hpBar = new Bar(this.x - 16, this.y - 54, 32, 3, this.hp, 100, Bar.darkGreen, Bar.green);
+        this.fpBar = new Bar(this.x - 16, this.y - 48, 32, 3, this.fp, 100, Bar.darkOrange, Bar.orange);
+        this.weightBar = new Bar(this.x - 16, this.y - 42, 32, 3, this.weight, 30, Bar.grey, Bar.white);
     }
 
     public BaseDuck(BaseDuck duck) {
@@ -86,6 +100,10 @@ public abstract class BaseDuck extends Entity {
         this.deathTimer = duck.getDeathTimer();
 
         this.isPlayingSound = duck.isPlayingSound();
+
+        this.hpBar = duck.getHpBar();
+        this.fpBar = duck.getFpBar();
+        this.weightBar = duck.getWeightBar();
     }
 
     // Getters
@@ -102,6 +120,9 @@ public abstract class BaseDuck extends Entity {
     public boolean isOverweight()       { return this.isOverweight; }
     public float getDeathTimer()        { return this.deathTimer; }
     public boolean isPlayingSound()     { return this.isPlayingSound; }
+    public Bar getHpBar()               { return this.hpBar; }
+    public Bar getFpBar()               { return this.fpBar; }
+    public Bar getWeightBar()           { return this.weightBar; }
     public abstract Animation[] getAnimations();
 
     // Setters
@@ -118,6 +139,9 @@ public abstract class BaseDuck extends Entity {
     public void setOverweight(boolean isOverweight) { this.isOverweight = isOverweight; }
     public void setDeathTimer(float deathTimer)     { this.deathTimer = deathTimer; }
     public void setPlayingSound(boolean isPlaying)  { this.isPlayingSound = isPlaying; }
+    public void setHpBar(Bar hpBar)                 { this.hpBar = hpBar; }
+    public void setFpBar(Bar fpBar)                 { this.fpBar = fpBar; }
+    public void setWeightBar(Bar weightBar)         { this.weightBar = weightBar; }
 
     // Methods
     // Rendering
@@ -172,6 +196,49 @@ public abstract class BaseDuck extends Entity {
 
     }
 
+    @Override
+    public void renderDebug(Graphics graphics) {
+        // Direction
+        graphics.setColor(new Color(0, 255, 0));
+        graphics.drawLine(this.x, this.y, this.targetX, this.targetY);
+
+        // Bars
+        this.hpBar.draw(graphics);
+        this.fpBar.draw(graphics);
+        this.weightBar.draw(graphics);
+    }
+
+    @Override
+    public void renderSuperDebug(Graphics graphics) {
+        float growRatio = (float) (1.6 * this.weight);
+
+        // Collider
+        graphics.setColor(new Color(255, 0, 0));
+        graphics.drawRect(this.x - 16, this.y - 32, 32 + growRatio, 32 + growRatio);
+
+        // Pos
+        graphics.setColor(new Color(0, 0, 0, .5f));
+
+        String pos = Math.round(this.x) + ":" + Math.round(this.y);
+        float posW = MainMenuState.debugTtf.getWidth(pos);
+        float posH = MainMenuState.debugTtf.getHeight(pos);
+        float posTextX = this.x - (posW / 2.0f);
+        float posTextY = this.y - (posH / 2.0f);
+
+        graphics.fillRect(posTextX - 1, posTextY - 1, posW + 1, posH + 1);
+        MainMenuState.debugTtf.drawString(posTextX, posTextY, pos);
+
+        // Target pos
+        String targetPos = Math.round(this.targetX) + ":" + Math.round(this.targetY);
+        float targetPosW = MainMenuState.debugTtf.getWidth(targetPos);
+        float targetPosH = MainMenuState.debugTtf.getHeight(targetPos);
+        float targetPosTextX = this.targetX - (targetPosW / 2.0f);
+        float targetPosTextY = this.targetY - (targetPosH / 2.0f);
+
+        graphics.fillRect(targetPosTextX - 1, targetPosTextY - 1, targetPosW + 1, targetPosH + 1);
+        MainMenuState.debugTtf.drawString(targetPosTextX, targetPosTextY, targetPos);
+    }
+
     // Update
     public void update(TiledMap map, List<WaterLily> waterLilies, int delta) {
         if (!this.isDead && !this.isOverweight) {
@@ -220,6 +287,11 @@ public abstract class BaseDuck extends Entity {
             this.x = nextX;
             this.y = nextY;
 
+            // Update bars
+            this.hpBar.setPos(this.x - 16, this.y - 54);
+            this.fpBar.setPos(this.x - 16, this.y - 48);
+            this.weightBar.setPos(this.x - 16, this.y - 42);
+
             getMoveDir();
         }
     }
@@ -258,6 +330,11 @@ public abstract class BaseDuck extends Entity {
             this.hp -= .01f * delta;
         }
 
+        // Update bars
+        this.hpBar.setValue(this.hp);
+        this.fpBar.setValue(this.fp);
+        this.weightBar.setValue(this.weight);
+
         // Check if the duck is overweight
         if (this.weight >= 30) {
             this.isOverweight = true;
@@ -284,8 +361,8 @@ public abstract class BaseDuck extends Entity {
             int margin = 25;
 
             if (
-                    (this.x >= wX - margin && this.x <= wX + wWidth + margin) &&
-                    (this.y >= wY - margin && this.y <= wY + wHeight + margin)
+                ((this.x >= wX - (wWidth / 2.0f) - margin) && (this.x <= wX + (wWidth / 2.0f) + margin)) &&
+                ((this.y >= wY - wHeight - margin) && (this.y <= wY + margin))
             ) {
                 float givenFp = Math.min(30, waterLily.getFp());
 
@@ -319,6 +396,7 @@ public abstract class BaseDuck extends Entity {
     }
 
     // Others
+    @Override
     public String toString() {
         return "Duck n°" + this.id + ":\n" +
                 "x: " + Math.round(this.x) + "px\n" +

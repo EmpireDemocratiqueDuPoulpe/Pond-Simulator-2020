@@ -13,7 +13,6 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import java.awt.*;
-import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 
@@ -45,9 +44,10 @@ public class MainMenuState extends BasicGameState implements ComponentListener {
     // Methods
     @Override
     public void init(GameContainer container, StateBasedGame game) {
-        container.setShowFPS(false);
         this.container = container;
         this.game = game;
+
+        this.container.setShowFPS(false);
 
         // Load images and fonts
         try {
@@ -77,6 +77,7 @@ public class MainMenuState extends BasicGameState implements ComponentListener {
     // Rendering
     private void loadImages() {
         try {
+            this.container.setIcon("resources/hud/ducksCount.png");
             this.background = new Image("resources/ui/mainMenuBg.png");
             this.gameName = new Image("resources/ui/gameName.png");
             this.editor = new Image("resources/ui/editor.png");
@@ -96,8 +97,8 @@ public class MainMenuState extends BasicGameState implements ComponentListener {
         java.awt.Font hudFont = java.awt.Font.createFont(java.awt.Font.TRUETYPE_FONT, new File("./src/resources/fonts/game_over_cre.ttf"));
 
         hudFont = hudFont.deriveFont(java.awt.Font.PLAIN, 14);
-        java.awt.Font buttonFont = hudFont.deriveFont(Font.PLAIN, 35);
-        java.awt.Font endFont = hudFont.deriveFont(Font.PLAIN, 48);
+        java.awt.Font buttonFont = hudFont.deriveFont(java.awt.Font.PLAIN, 35);
+        java.awt.Font endFont = hudFont.deriveFont(java.awt.Font.PLAIN, 48);
 
         hudTtf = new TrueTypeFont(hudFont, true);
         endTtf = new UnicodeFont(endFont);

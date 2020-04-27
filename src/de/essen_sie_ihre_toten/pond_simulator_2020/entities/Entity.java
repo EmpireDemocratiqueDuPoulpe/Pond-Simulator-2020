@@ -17,7 +17,7 @@ public abstract class Entity {
     protected float y;
     protected int dir;
 
-    private static List<Integer> deathList;
+    private static List<Integer> deathList = new ArrayList<>();
 
     // Constructors
     public Entity() {
@@ -27,8 +27,6 @@ public abstract class Entity {
         this.x = (int) (Math.random() * (864 - 128)) + 128;
         this.y = (int) (Math.random() * (544 - 128)) + 128;
         this.dir = (int) (Math.random() * (4));
-
-        deathList = new ArrayList<>();
     }
 
     public Entity(float x, float y) {
@@ -38,8 +36,6 @@ public abstract class Entity {
         this.x = x;
         this.y = y;
         this.dir = (int) (Math.random() * (4));
-
-        deathList = new ArrayList<>();
     }
 
     public Entity(float x, float y, int dir) {
@@ -49,8 +45,6 @@ public abstract class Entity {
         this.x = x;
         this.y = y;
         this.dir = dir;
-
-        deathList = new ArrayList<>();
     }
 
     // Getters
@@ -79,8 +73,8 @@ public abstract class Entity {
         return animation;
     }
 
-    public void render() {}
-    public void renderDebug() {
+    public void render() {};
+    public void renderDebug(Graphics graphics) {
         String[] lines = this.toString().split("\n");
         float textX = this.x - 40;
         float textY = this.y;
@@ -90,6 +84,7 @@ public abstract class Entity {
             textY += 14;
         }
     }
+    public void renderSuperDebug(Graphics graphics) {}
 
     // Update
     public void update() {}
