@@ -7,18 +7,14 @@ import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.CaptainDuck;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.Duck;
 import de.essen_sie_ihre_toten.pond_simulator_2020.hud.HUD;
 
+import de.essen_sie_ihre_toten.pond_simulator_2020.main_menu.MainMenuState;
 import org.newdawn.slick.*;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.font.effects.ColorEffect;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.tiled.TiledMap;
 
-import java.awt.*;
-import java.awt.Font;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,10 +34,6 @@ public class PondState extends BasicGameState {
     private List<WaterLily> waterLilies;
 
     private Music bgMusic;
-
-    public static TrueTypeFont hudTtf;
-    public static TrueTypeFont debugTtf;
-    public static UnicodeFont endTtf;
 
     // Getters
     public int getID()                      { return ID; }
@@ -92,10 +84,7 @@ public class PondState extends BasicGameState {
             // Sounds
             loadMusics();
             BaseDuck.loadSounds();
-
-            // Fonts
-            loadFonts();
-        } catch (FontFormatException | IOException | SlickException sE) {
+        } catch (SlickException sE) {
             sE.printStackTrace();
         }
     }
@@ -208,26 +197,6 @@ public class PondState extends BasicGameState {
         this.bgMusic.setVolume(0.5f);
     }
 
-    // Fonts
-    private void loadFonts() throws FontFormatException, IOException, SlickException {
-        Font debugFont = new Font("Verdana", Font.PLAIN, 14);
-        debugTtf = new TrueTypeFont(debugFont, true);
-
-
-        Font hudFont = Font.createFont(Font.TRUETYPE_FONT, new File("./src/resources/fonts/game_over_cre.ttf"));
-
-        hudFont = hudFont.deriveFont(Font.PLAIN, 14);
-        Font endFont = hudFont.deriveFont(Font.PLAIN, 48);
-
-        hudTtf = new TrueTypeFont(hudFont, true);
-        endTtf = new UnicodeFont(endFont);
-
-        endTtf.addAsciiGlyphs();
-        endTtf.getEffects().add(new ColorEffect(java.awt.Color.white));
-        endTtf.addAsciiGlyphs();
-        endTtf.loadGlyphs();
-    }
-
     // Others
     private void renderEnd(Graphics graphics) {
         graphics.setColor(new Color(0, 0, 0));
@@ -237,21 +206,21 @@ public class PondState extends BasicGameState {
         String message2 = "Tous les canards sont morts";
         String message3 = "Qu'ils reposent en canards laques ;(";
 
-        endTtf.drawString(
-                ((float) container.getWidth() / 2) - ((float) endTtf.getWidth(message) / 2),
-                (((float) container.getHeight() / 2) - ((float) endTtf.getHeight(message) / 2)) - 50,
+        MainMenuState.endTtf.drawString(
+                ((float) container.getWidth() / 2) - ((float) MainMenuState.endTtf.getWidth(message) / 2),
+                (((float) container.getHeight() / 2) - ((float) MainMenuState.endTtf.getHeight(message) / 2)) - 50,
                 message
         );
 
-        endTtf.drawString(
-                ((float) container.getWidth() / 2) - ((float) endTtf.getWidth(message2) / 2),
-                ((float) container.getHeight() / 2) - ((float) endTtf.getHeight(message2) / 2),
+        MainMenuState.endTtf.drawString(
+                ((float) container.getWidth() / 2) - ((float) MainMenuState.endTtf.getWidth(message2) / 2),
+                ((float) container.getHeight() / 2) - ((float) MainMenuState.endTtf.getHeight(message2) / 2),
                 message2
         );
 
-        endTtf.drawString(
-                ((float) container.getWidth() / 2) - ((float) endTtf.getWidth(message3) / 2),
-                (((float) container.getHeight() / 2) - ((float) endTtf.getHeight(message3) / 2)) + 50,
+        MainMenuState.endTtf.drawString(
+                ((float) container.getWidth() / 2) - ((float) MainMenuState.endTtf.getWidth(message3) / 2),
+                (((float) container.getHeight() / 2) - ((float) MainMenuState.endTtf.getHeight(message3) / 2)) + 50,
                 message3
         );
     }

@@ -3,6 +3,7 @@ package de.essen_sie_ihre_toten.pond_simulator_2020.hud;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.BaseDuck;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.CaptainDuck;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.Duck;
+import de.essen_sie_ihre_toten.pond_simulator_2020.main_menu.MainMenuState;
 import de.essen_sie_ihre_toten.pond_simulator_2020.pond.PondState;
 
 import org.newdawn.slick.*;
@@ -39,7 +40,7 @@ public class HUD {
 
     private void drawDucksCount(Graphics graphics) {
         graphics.drawImage(this.ducksCount, 10, 10);
-        PondState.hudTtf.drawString(12 + ducksCount.getWidth(), 14, ": " + (Duck.getDucksCount() + CaptainDuck.getDucksCount()), Color.white);
+        MainMenuState.hudTtf.drawString(12 + ducksCount.getWidth(), 14, ": " + (Duck.getDucksCount() + CaptainDuck.getDucksCount()), Color.white);
     }
 
     private void drawKeys(GameContainer container, Graphics graphics) {
@@ -63,7 +64,7 @@ public class HUD {
 
             // Draw the key
             graphics.drawImage(image, keyDX, keyDY);
-            PondState.hudTtf.drawString(keyDX + 42, keyDY + 8, name, color);
+            MainMenuState.hudTtf.drawString(keyDX + 42, keyDY + 8, name, color);
 
             keyDY += 40;
         }

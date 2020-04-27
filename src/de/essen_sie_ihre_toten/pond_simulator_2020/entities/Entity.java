@@ -1,5 +1,6 @@
 package de.essen_sie_ihre_toten.pond_simulator_2020.entities;
 
+import de.essen_sie_ihre_toten.pond_simulator_2020.main_menu.MainMenuState;
 import de.essen_sie_ihre_toten.pond_simulator_2020.pond.PondState;
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
@@ -85,7 +86,7 @@ public abstract class Entity {
         float textY = this.y;
 
         for (String line : lines) {
-            PondState.debugTtf.drawString(textX, textY, line, Color.white);
+            MainMenuState.debugTtf.drawString(textX, textY, line, Color.white);
             textY += 14;
         }
     }
