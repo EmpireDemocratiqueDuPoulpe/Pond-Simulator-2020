@@ -1,7 +1,7 @@
 package de.essen_sie_ihre_toten.pond_simulator_2020.pond;
 
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.Entity;
-import de.essen_sie_ihre_toten.pond_simulator_2020.entities.WaterLily.WaterLily;
+import de.essen_sie_ihre_toten.pond_simulator_2020.entities.water_lily.WaterLily;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.BaseDuck;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.CaptainDuck;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.Duck;

@@ -2,13 +2,12 @@ package de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck;
 
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.Entity;
 
-import de.essen_sie_ihre_toten.pond_simulator_2020.entities.WaterLily.WaterLily;
+import de.essen_sie_ihre_toten.pond_simulator_2020.entities.water_lily.WaterLily;
 import de.essen_sie_ihre_toten.pond_simulator_2020.hud.Bar;
 import de.essen_sie_ihre_toten.pond_simulator_2020.main_menu.MainMenuState;
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 

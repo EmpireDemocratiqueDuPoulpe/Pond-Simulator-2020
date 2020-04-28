@@ -1,4 +1,4 @@
-package de.essen_sie_ihre_toten.pond_simulator_2020.entities.WaterLily;
+package de.essen_sie_ihre_toten.pond_simulator_2020.entities.water_lily;
 
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.Entity;
 
