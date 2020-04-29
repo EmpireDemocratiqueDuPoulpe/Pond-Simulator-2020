@@ -22,7 +22,7 @@ public class Duck extends BaseDuck {
     }
 
     // Getters
-    public static int getDucksCount()          { return ducksCount; }
+    public static int getDucksCount()   { return ducksCount; }
     public Animation[] getAnimations()  { return animations; }
 
     // Setters

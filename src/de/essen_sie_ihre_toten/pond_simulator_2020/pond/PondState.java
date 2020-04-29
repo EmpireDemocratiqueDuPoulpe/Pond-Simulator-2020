@@ -31,7 +31,7 @@ public class PondState extends BasicGameState {
 
     private TiledMap map;
     private HUD hud;
-    private List<BaseDuck> ducks;
+    private static List<BaseDuck> ducks;
     private List<WaterLily> waterLilies;
 
     private Music bgMusic;
@@ -40,6 +40,7 @@ public class PondState extends BasicGameState {
     public int getID()                          { return ID; }
     public static boolean debugActivated()      { return debug; }
     public static boolean superDebugActivated() { return superDebug; }
+    public static List<BaseDuck> getDucks()     { return ducks; }
 
     // Methods
     // Slick2D
@@ -58,7 +59,7 @@ public class PondState extends BasicGameState {
         this.hud = new HUD();
 
         // Init entities
-        this.ducks = new ArrayList<>(
+        ducks = new ArrayList<>(
             Arrays.asList(
                 new Duck(),
                 new Duck(),
@@ -104,7 +105,7 @@ public class PondState extends BasicGameState {
             waterLily.render(graphics);
         }
 
-        for (BaseDuck duck : this.ducks) {
+        for (BaseDuck duck : ducks) {
             duck.render(graphics);
         }
 
@@ -121,7 +122,7 @@ public class PondState extends BasicGameState {
                 if (superDebug) waterLily.renderSuperDebug(graphics);
             }
 
-            for (BaseDuck duck : this.ducks) {
+            for (BaseDuck duck : ducks) {
                 duck.renderDebug(graphics);
                 if (superDebug) duck.renderSuperDebug(graphics);
             }
@@ -133,35 +134,70 @@ public class PondState extends BasicGameState {
         if (this.isEnd) return;
 
         // Add new entities
-        if ((Math.random() * (100)) <= .06f)
+        if ((Math.random() * (100)) <= .08f)
             this.waterLilies.add(new WaterLily());
 
         if (Duck.getDucksCount() >= 2)
             if ((Math.random() * (100)) <= .01f)
-                this.ducks.add(new Duck());
+                ducks.add(new Duck());
 
         // Update entities
         for (WaterLily waterLily : this.waterLilies) {
             waterLily.update();
         }
 
-        for (BaseDuck duck : this.ducks) {
+        for (BaseDuck duck : ducks) {
             duck.update(map, waterLilies, delta);
         }
 
         // Convert ducks to CaptainDuck
-        this.ducks = ducks.stream()
-            .map(duck -> ((duck.getWeight() >= 10) && !(duck instanceof CaptainDuck) && (CaptainDuck.getDucksCount() < 3)) ? new CaptainDuck(duck) : duck)
+        ducks = ducks.stream()
+            .map(duck -> (
+                    (duck.getWeight() >= 10) && // Weight at 10 or more
+                    !(duck instanceof CaptainDuck) && // Not a CaptainDuck
+                    (CaptainDuck.getDucksCount() < 3)) && // Not already three Captain alive
+                    !(duck.isInQueue()) ? new CaptainDuck(duck) : duck) // Not in queue
             .collect(Collectors.toList());
 
         // Delete dead entities
-        if (Entity.deadListNotEmpty()) {
-            this.ducks.removeIf(ent -> Entity.getDeathList().contains(ent.getId()));
+        /*if (Entity.deadListNotEmpty()) {
+            ducks.removeIf(ent -> Entity.getDeathList().contains(ent.getId()));
             this.waterLilies.removeIf(ent -> Entity.getDeathList().contains(ent.getId()));
 
             // Update ducks count
-            int ducksCount = (int) this.ducks.stream().filter(duck -> duck instanceof Duck).count();
-            int captainDucksCount = (int) this.ducks.stream().filter(duck -> duck instanceof CaptainDuck).count();
+            int ducksCount = (int) ducks.stream().filter(duck -> duck instanceof Duck).count();
+            int captainDucksCount = (int) ducks.stream().filter(duck -> duck instanceof CaptainDuck).count();
+
+            if ((ducksCount + captainDucksCount) == 0)
+                this.isEnd = true;
+            else {
+                Duck.setDucksCount(ducksCount);
+                CaptainDuck.setDucksCount(captainDucksCount);
+            }
+        }*/
+
+        if (Entity.deadListNotEmpty()) {
+            // Water lilies
+            this.waterLilies.removeIf(ent -> Entity.getDeathList().contains(ent.getId()));
+
+            // Ducks
+            List<Integer> ducksIds = new ArrayList<>();
+
+            for (BaseDuck duck : ducks) {
+                if (Entity.getDeathList().contains(duck.getId())) {
+                    if (duck instanceof CaptainDuck) {
+                        ((CaptainDuck) duck).emptyQueue();
+                    }
+
+                    ducksIds.add(duck.getId());
+                }
+            }
+
+            ducks.removeIf(d -> ducksIds.contains(d.getId()));
+
+            // Update ducks count
+            int ducksCount = (int) ducks.stream().filter(duck -> duck instanceof Duck).count();
+            int captainDucksCount = (int) ducks.stream().filter(duck -> duck instanceof CaptainDuck).count();
 
             if ((ducksCount + captainDucksCount) == 0)
                 this.isEnd = true;
