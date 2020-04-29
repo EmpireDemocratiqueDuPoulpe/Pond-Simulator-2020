@@ -16,10 +16,13 @@ public class Bar {
     private Color backgroundColor;
     private Color barColor;
 
-    public static Color darkGreen = new Color(8, 36, 16);
-    public static Color green = new Color(46, 209, 95);
+    public static Color darkRed = new Color(66, 19, 16);
+    public static Color red = new Color(235, 64, 52);
     public static Color darkOrange = new Color(36, 29, 8);
     public static Color orange = new Color(209, 152, 44);
+    public static Color darkGreen = new Color(8, 36, 16);
+    public static Color green = new Color(46, 209, 95);
+    public static Color black = new Color(0, 0, 0);
     public static Color grey = new Color(46, 46, 46);
     public static Color white = new Color(255, 255, 255);
 
