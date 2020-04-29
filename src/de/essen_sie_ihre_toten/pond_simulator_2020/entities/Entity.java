@@ -1,7 +1,6 @@
 package de.essen_sie_ihre_toten.pond_simulator_2020.entities;
 
 import de.essen_sie_ihre_toten.pond_simulator_2020.main_menu.MainMenuState;
-import de.essen_sie_ihre_toten.pond_simulator_2020.pond.PondState;
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
 
@@ -15,6 +14,8 @@ public abstract class Entity {
 
     protected float x;
     protected float y;
+    protected float width;
+    protected float height;
     protected int dir;
 
     private static List<Integer> deathList = new ArrayList<>();
@@ -24,8 +25,10 @@ public abstract class Entity {
         entitiesCount++;
         this.id = entitiesCount;
 
-        this.x = (int) (Math.random() * (864 - 128)) + 128;
-        this.y = (int) (Math.random() * (544 - 128)) + 128;
+        this.x = (float) (Math.random() * (864 - 128)) + 128;
+        this.y = (float) (Math.random() * (544 - 128)) + 128;
+        this.width = 32;
+        this.height = 32;
         this.dir = (int) (Math.random() * (4));
     }
 
@@ -35,15 +38,30 @@ public abstract class Entity {
 
         this.x = x;
         this.y = y;
+        this.width = 32;
+        this.height = 32;
         this.dir = (int) (Math.random() * (4));
     }
 
-    public Entity(float x, float y, int dir) {
+    public Entity(float x, float y, float width, float height) {
         entitiesCount++;
         this.id = entitiesCount;
 
         this.x = x;
         this.y = y;
+        this.width = width;
+        this.height = height;
+        this.dir = (int) (Math.random() * (4));
+    }
+
+    public Entity(float x, float y, float width, float height, int dir) {
+        entitiesCount++;
+        this.id = entitiesCount;
+
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
         this.dir = dir;
     }
 
@@ -51,14 +69,18 @@ public abstract class Entity {
     public int getId()                          { return this.id; }
     public float getX()                         { return this.x; }
     public float getY()                         { return this.y; }
+    public float getWidth()                     { return this.width; }
+    public float getHeight()                    { return this.height; }
     public int getDir()                         { return this.dir; }
     public static List<Integer> getDeathList()  { return deathList; }
     public static boolean deadListNotEmpty()    { return deathList.size() > 0; }
 
     // Setters
-    public void setX(float x)   { this.x = x;}
-    public void setY(float y)   { this.y = y;}
-    public void setDir(int dir) { this.dir = dir; }
+    public void setX(float x)           { this.x = x;}
+    public void setY(float y)           { this.y = y;}
+    public void setWidth(float width)   { this.width = width; }
+    public void setHeight(float height) { this.height = height; }
+    public void setDir(int dir)         { this.dir = dir; }
 
     // Methods
     // Rendering
@@ -73,10 +95,10 @@ public abstract class Entity {
         return animation;
     }
 
-    public void render() {};
+    public abstract void render(Graphics graphics);
     public void renderDebug(Graphics graphics) {
         String[] lines = this.toString().split("\n");
-        float textX = this.x - 40;
+        float textX = this.x - this.width;
         float textY = this.y;
 
         for (String line : lines) {
@@ -84,7 +106,24 @@ public abstract class Entity {
             textY += 14;
         }
     }
-    public void renderSuperDebug(Graphics graphics) {}
+    public void renderSuperDebug(Graphics graphics) {
+        // Collider
+        graphics.setColor(new Color(255, 0, 0));
+
+        graphics.drawRect(this.x - (this.width / 2), this.y - this.height, this.width, this.height);
+
+        // Pos
+        graphics.setColor(new Color(0, 0, 0, .5f));
+
+        String pos = Math.round(this.x) + ":" + Math.round(this.y);
+        float posW = MainMenuState.debugTtf.getWidth(pos);
+        float posH = MainMenuState.debugTtf.getHeight(pos);
+        float posTextX = this.x - (posW / 2.0f);
+        float posTextY = this.y - (posH / 2.0f);
+
+        graphics.fillRect(posTextX - 1, posTextY - 1, posW + 1, posH + 1);
+        MainMenuState.debugTtf.drawString(posTextX, posTextY, pos);
+    }
 
     // Update
     public void update() {}

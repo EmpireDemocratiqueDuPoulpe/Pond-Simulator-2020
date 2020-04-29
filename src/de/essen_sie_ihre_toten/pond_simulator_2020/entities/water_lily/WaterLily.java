@@ -2,13 +2,14 @@ package de.essen_sie_ihre_toten.pond_simulator_2020.entities.water_lily;
 
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.Entity;
 
+import de.essen_sie_ihre_toten.pond_simulator_2020.entities.EntityTrigger;
 import de.essen_sie_ihre_toten.pond_simulator_2020.hud.Bar;
-import de.essen_sie_ihre_toten.pond_simulator_2020.main_menu.MainMenuState;
 import org.newdawn.slick.*;
 
-public class WaterLily extends Entity {
+public class WaterLily extends Entity implements EntityTrigger {
     // Attributes
     private float fp;
+    private float triggerRadius;
 
     private Bar fpBar;
 
@@ -17,43 +18,48 @@ public class WaterLily extends Entity {
     // Constructors
     public WaterLily() {
         super();
+        this.width = 64;
+        this.height = 64;
 
         this.fp = 90;
+        this.triggerRadius = (this.width / 2) + 25;
 
-        this.fpBar = new Bar(this.x - 32, this.y - 74, 64, 3, this.fp, this.fp, Bar.darkOrange, Bar.orange);
+        this.fpBar = new Bar(this.x - (this.width / 2), this.y - this.height - 10, this.width, 3, this.fp, this.fp, Bar.darkOrange, Bar.orange);
     }
 
     public WaterLily(float x, float y) {
-        super(x, y);
+        super(x, y, 64, 64);
 
         this.fp = 90;
 
-        this.fpBar = new Bar(this.x - 32, this.y - 74, 64, 3, this.fp, this.fp, Bar.darkOrange, Bar.orange);
+        this.fpBar = new Bar(this.x - (this.width / 2), this.y - this.height - 10, this.width, 3, this.fp, this.fp, Bar.darkOrange, Bar.orange);
     }
 
     public WaterLily(float x, float y, int dir) {
-        super(x, y, dir);
+        super(x, y, 64, 64, dir);
 
         this.fp = 90;
 
-        this.fpBar = new Bar(this.x - 32, this.y - 74, 64, 3, this.fp, this.fp, Bar.darkOrange, Bar.orange);
+        this.fpBar = new Bar(this.x - (this.width / 2), this.y - this.height - 10, this.width, 3, this.fp, this.fp, Bar.darkOrange, Bar.orange);
     }
 
     public WaterLily(float x, float y, int dir, float fp) {
-        super(x, y, dir);
+        super(x, y, 64, 64, dir);
 
         this.fp = fp;
 
-        this.fpBar = new Bar(this.x - 32, this.y - 74, 64, 3, this.fp, this.fp, Bar.darkOrange, Bar.orange);
+        this.fpBar = new Bar(this.x - (this.width / 2), this.y - this.height - 10, this.width, 3, this.fp, this.fp, Bar.darkOrange, Bar.orange);
     }
 
     // Getters
-    public float getFp()    { return this.fp; }
-    public Bar getFpBar()   { return this.fpBar; }
+    public float getFp()            { return this.fp; }
+    public float getTriggerRadius() { return this.triggerRadius; }
+    public Bar getFpBar()           { return this.fpBar; }
 
     // Setters
-    public void setFp(float fp)     { this.fp = fp; }
-    public void setFpBar(Bar fpBar) { this.fpBar = fpBar; }
+    public void setFp(float fp)                         { this.fp = fp; }
+    public void setTriggerRadius(float triggerRadius)   { this.triggerRadius = triggerRadius; }
+    public void setFpBar(Bar fpBar)                     { this.fpBar = fpBar; }
 
     // Methods
     // Rendering
@@ -68,7 +74,7 @@ public class WaterLily extends Entity {
     }
 
     public void render(Graphics graphics) {
-        graphics.drawAnimation(animations[this.dir], this.x - 32, this.y - 64);
+        graphics.drawAnimation(animations[this.dir], this.x - (this.width / 2), this.y - this.height);
     }
 
     @Override
@@ -79,32 +85,27 @@ public class WaterLily extends Entity {
 
     @Override
     public void renderSuperDebug(Graphics graphics) {
-        // Collider
-        graphics.setColor(new Color(255, 0, 0));
-        graphics.drawRect(this.x - 32, this.y - 64, 64, 64);
+        super.renderSuperDebug(graphics);
 
         // Trigger for eating
         graphics.setColor(new Color(255, 255, 255));
-        graphics.drawRect(this.x - 32 - 25, this.y - 64 - 25, 64 + 50, 64 + 50);
-
-        // Pos
-        graphics.setColor(new Color(0, 0, 0, .5f));
-
-        String pos = Math.round(this.x) + ":" + Math.round(this.y);
-        float posW = MainMenuState.debugTtf.getWidth(pos);
-        float posH = MainMenuState.debugTtf.getHeight(pos);
-        float posTextX = this.x - (posW / 2.0f);
-        float posTextY = this.y - (posH / 2.0f);
-
-        graphics.fillRect(posTextX - 1, posTextY - 1, posW + 1, posH + 1);
-        MainMenuState.debugTtf.drawString(posTextX, posTextY, pos);
+        graphics.drawOval(
+            this.x - this.triggerRadius,
+            this.y - (this.height / 2) - this.triggerRadius,
+            this.triggerRadius * 2,
+            this.triggerRadius * 2
+        );
     }
 
     // Update
     public void update() {
         if (this.fp <= 0) { Entity.addToDeathList(this.id); }
-        this.fpBar.setPos(this.x - 32, this.y - 74);
+        this.fpBar.setPos(this.x - (this.width / 2), this.y - this.height - 10);
         this.fpBar.setValue(this.fp);
+    }
+
+    public boolean isInsideRadius(float x, float y) {
+        return (Math.pow((x - this.x), 2) + Math.pow((y - (this.y - (this.height / 2))), 2)) <= Math.pow(this.triggerRadius, 2);
     }
 
     // Others

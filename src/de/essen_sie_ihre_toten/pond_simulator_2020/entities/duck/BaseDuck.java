@@ -13,36 +13,43 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class BaseDuck extends Entity {
     // Attributes
-    private float targetX;
-    private float targetY;
-    private float speed;
-    private boolean isMoving;
+    protected float targetX;
+    protected float targetY;
+    protected float speed;
+    protected boolean isMoving;
+    protected boolean canGetNewPos;
+    protected boolean isInQueue;
 
-    private float hp;
-    private float fp;
-    private int weight;
-    private static boolean canEat = true;
-    private float eatCooldown;
-    private boolean isDead;
-    private boolean isOverweight;
-    private float deathTimer;
+    protected float hp;
+    protected float fp;
+    protected int weight;
+    protected static boolean canEat = true;
+    protected float eatCooldown;
+    protected boolean isDead;
+    protected boolean isOverweight;
+    protected float deathTimer;
 
-    private static Sound explode;
-    private static Sound dying;
-    private boolean isPlayingSound;
+    protected static Sound whistle;
+    protected static Sound explode;
+    protected static Sound dying;
+    protected boolean isPlayingSound;
 
-    private Bar hpBar;
-    private Bar fpBar;
-    private Bar weightBar;
+    protected Bar hpBar;
+    protected Bar fpBar;
+    protected Bar weightBar;
+    protected Bar eatCooldownBar;
 
     // Constructors
     public BaseDuck() {
         super();
+        this.width = 32;
+        this.height = 32;
 
         this.targetX = this.x;
         this.targetY = this.y;
         this.speed = 0.2f;
         this.isMoving = false;
+        this.canGetNewPos = true;
 
         this.hp = 100;
         this.fp = 100;
@@ -54,18 +61,20 @@ public abstract class BaseDuck extends Entity {
 
         this.isPlayingSound = false;
 
-        this.hpBar = new Bar(this.x - 16, this.y - 54, 32, 3, this.hp, 100, Bar.darkGreen, Bar.green);
-        this.fpBar = new Bar(this.x - 16, this.y - 48, 32, 3, this.fp, 100, Bar.darkOrange, Bar.orange);
-        this.weightBar = new Bar(this.x - 16, this.y - 42, 32, 3, this.weight, 30, Bar.grey, Bar.white);
+        this.hpBar = new Bar(this.x - (this.width / 2), this.y - (this.height / 2) - 22, this.width, 3, this.hp, 100, Bar.darkGreen, Bar.green);
+        this.fpBar = new Bar(this.x - (this.width / 2), this.y - (this.height / 2) - 16, this.width, 3, this.fp, 100, Bar.darkOrange, Bar.orange);
+        this.weightBar = new Bar(this.x - (this.width / 2), this.y - (this.height / 2) - 10, this.width, 3, this.weight, 30, Bar.grey, Bar.white);
+        this.eatCooldownBar = new Bar(this.x - (this.width / 2), this.y - (this.height / 2) - 8, this.width, 2, this.eatCooldown, 10, Bar.darkRed, Bar.red);
     }
 
     public BaseDuck(float x, float y) {
-        super(x, y);
+        super(x, y, 32, 32);
 
         this.targetX = this.x;
         this.targetY = this.y;
         this.speed = 0.2f;
         this.isMoving = false;
+        this.canGetNewPos = true;
 
         this.hp = 100;
         this.fp = 100;
@@ -77,18 +86,21 @@ public abstract class BaseDuck extends Entity {
 
         this.isPlayingSound = false;
 
-        this.hpBar = new Bar(this.x - 16, this.y - 54, 32, 3, this.hp, 100, Bar.darkGreen, Bar.green);
-        this.fpBar = new Bar(this.x - 16, this.y - 48, 32, 3, this.fp, 100, Bar.darkOrange, Bar.orange);
-        this.weightBar = new Bar(this.x - 16, this.y - 42, 32, 3, this.weight, 30, Bar.grey, Bar.white);
+        this.hpBar = new Bar(this.x - (this.width / 2), this.y - (this.height / 2) - 22, this.width, 3, this.hp, 100, Bar.darkGreen, Bar.green);
+        this.fpBar = new Bar(this.x - (this.width / 2), this.y - (this.height / 2) - 16, this.width, 3, this.fp, 100, Bar.darkOrange, Bar.orange);
+        this.weightBar = new Bar(this.x - (this.width / 2), this.y - (this.height / 2) - 10, this.width, 3, this.weight, 30, Bar.grey, Bar.white);
+        this.eatCooldownBar = new Bar(this.x - (this.width / 2), this.y - (this.height / 2) - 8, this.width, 2, this.eatCooldown, 10, Bar.darkRed, Bar.red);
     }
 
     public BaseDuck(BaseDuck duck) {
-        super(duck.getX(), duck.getY());
+        super(duck.getX(), duck.getY(), duck.getWidth(), duck.getHeight(), duck.getDir());
 
         this.targetX = duck.getTargetX();
         this.targetY = duck.getTargetY();
         this.speed = duck.getSpeed();
         this.isMoving = duck.isMoving();
+        this.canGetNewPos = duck.canGetNewPos();
+        this.isInQueue = duck.isInQueue();
 
         this.hp = duck.getHp();
         this.fp = duck.getFp();
@@ -103,6 +115,7 @@ public abstract class BaseDuck extends Entity {
         this.hpBar = duck.getHpBar();
         this.fpBar = duck.getFpBar();
         this.weightBar = duck.getWeightBar();
+        this.eatCooldownBar = duck.getEatCooldownBar();
     }
 
     // Getters
@@ -110,6 +123,8 @@ public abstract class BaseDuck extends Entity {
     public float getTargetY()           { return this.targetY; }
     public float getSpeed()             { return this.speed; }
     public boolean isMoving()           { return this.isMoving; }
+    public boolean canGetNewPos()       { return this.canGetNewPos; }
+    public boolean isInQueue()          { return this.isInQueue; }
     public float getHp()                { return this.hp; }
     public float getFp()                { return this.fp; }
     public int getWeight()              { return this.weight; }
@@ -122,25 +137,30 @@ public abstract class BaseDuck extends Entity {
     public Bar getHpBar()               { return this.hpBar; }
     public Bar getFpBar()               { return this.fpBar; }
     public Bar getWeightBar()           { return this.weightBar; }
+    public Bar getEatCooldownBar()      { return this.eatCooldownBar; }
     public abstract Animation[] getAnimations();
 
     // Setters
-    public void setTargetX(float targetX)           { this.targetX = targetX; }
-    public void setTargetY(float targetY)           { this.targetY = targetY; }
-    public void setSpeed(float speed)               { this.speed = speed; }
-    public void setMoving(boolean isMoving)         { this.isMoving = isMoving; }
-    public void setHp(float hp)                     { this.hp = Math.min(100, hp); }
-    public void setFp(float fp)                     { this.fp = Math.min(100, fp); }
-    public void setWeight(int weight)               { this.weight = weight; }
-    public static void setCanEat(boolean eat)       { canEat = eat; }
-    public void setEatCooldown(float cooldown)      { this.eatCooldown = cooldown; }
-    public void setDead(boolean isDead)             { this.isDead = isDead; }
-    public void setOverweight(boolean isOverweight) { this.isOverweight = isOverweight; }
-    public void setDeathTimer(float deathTimer)     { this.deathTimer = deathTimer; }
-    public void setPlayingSound(boolean isPlaying)  { this.isPlayingSound = isPlaying; }
-    public void setHpBar(Bar hpBar)                 { this.hpBar = hpBar; }
-    public void setFpBar(Bar fpBar)                 { this.fpBar = fpBar; }
-    public void setWeightBar(Bar weightBar)         { this.weightBar = weightBar; }
+    public void setTargetX(float targetX)               { this.targetX = targetX; }
+    public void setTargetY(float targetY)               { this.targetY = targetY; }
+    public void setTarget(float targetX, float targetY) { this.targetX = targetX; this.targetY = targetY; }
+    public void setSpeed(float speed)                   { this.speed = speed; }
+    public void setMoving(boolean isMoving)             { this.isMoving = isMoving; }
+    public void setCanGetNewPos(boolean canGetNewPos)   { this.canGetNewPos = canGetNewPos; }
+    public void setInQueue(boolean isInQueue)           { this.isInQueue = isInQueue; }
+    public void setHp(float hp)                         { this.hp = Math.min(100, hp); }
+    public void setFp(float fp)                         { this.fp = Math.min(100, fp); }
+    public void setWeight(int weight)                   { this.weight = weight; }
+    public static void setCanEat(boolean eat)           { canEat = eat; }
+    public void setEatCooldown(float cooldown)          { this.eatCooldown = cooldown; }
+    public void setDead(boolean isDead)                 { this.isDead = isDead; }
+    public void setOverweight(boolean isOverweight)     { this.isOverweight = isOverweight; }
+    public void setDeathTimer(float deathTimer)         { this.deathTimer = deathTimer; }
+    public void setPlayingSound(boolean isPlaying)      { this.isPlayingSound = isPlaying; }
+    public void setHpBar(Bar hpBar)                     { this.hpBar = hpBar; }
+    public void setFpBar(Bar fpBar)                     { this.fpBar = fpBar; }
+    public void setWeightBar(Bar weightBar)             { this.weightBar = weightBar; }
+    public void setEatCooldownBar(Bar eatCooldownBar)   { this.eatCooldownBar = eatCooldownBar; }
 
     // Methods
     // Rendering
@@ -171,26 +191,22 @@ public abstract class BaseDuck extends Entity {
     }
 
     public void render(Graphics graphics) {
-        float originX = this.x - 16;
-        float originY = this.y - 32;
-
-        float growRatio = (float) (1.6 * this.weight);
-
-        float size = 32 + growRatio;
+        float originX = this.x - (this.width / 2);
+        float originY = this.y - this.height;
 
         if (!this.isDead && !this.isOverweight) {
             // Shadow
+            float ovalHeight = (this.height / 2);
+
             graphics.setColor(new Color(0, 0, 0, .5f));
-            graphics.fillOval(originX, originY + 24, size, 16 + growRatio);
+            graphics.fillOval(originX, this.y - (ovalHeight / 2), this.width, ovalHeight);
 
             // Duck
-            //graphics.drawAnimation(getAnimations()[this.dir + (this.isMoving ? 4 : 0)], this.x - 16, this.y - 32);
-            getAnimations()[this.dir + (this.isMoving ? 4 : 0)].draw(originX, originY, size, size);
+            getAnimations()[this.dir + (this.isMoving ? 4 : 0)].draw(originX, originY, this.width, this.height);
         } else if (this.isOverweight) {
-            //graphics.drawAnimation(getAnimations()[8], originX, originY);
-            getAnimations()[9].draw(originX, originY, size, size);
+            getAnimations()[9].draw(originX, originY, this.width, this.height);
         } else {
-            getAnimations()[8].draw(originX, originY, size, size);
+            getAnimations()[8].draw(originX, originY, this.width, this.height);
         }
 
     }
@@ -198,34 +214,20 @@ public abstract class BaseDuck extends Entity {
     @Override
     public void renderDebug(Graphics graphics) {
         // Direction
-        graphics.setColor(new Color(0, 255, 0));
+        if (this.isInQueue) { graphics.setColor(new Color(255, 0, 0)); }
+        else                { graphics.setColor(new Color(0, 255, 0)); }
         graphics.drawLine(this.x, this.y, this.targetX, this.targetY);
 
         // Bars
         this.hpBar.draw(graphics);
         this.fpBar.draw(graphics);
         this.weightBar.draw(graphics);
+        this.eatCooldownBar.draw(graphics);
     }
 
     @Override
     public void renderSuperDebug(Graphics graphics) {
-        float growRatio = (float) (1.6 * this.weight);
-
-        // Collider
-        graphics.setColor(new Color(255, 0, 0));
-        graphics.drawRect(this.x - 16, this.y - 32, 32 + growRatio, 32 + growRatio);
-
-        // Pos
-        graphics.setColor(new Color(0, 0, 0, .5f));
-
-        String pos = Math.round(this.x) + ":" + Math.round(this.y);
-        float posW = MainMenuState.debugTtf.getWidth(pos);
-        float posH = MainMenuState.debugTtf.getHeight(pos);
-        float posTextX = this.x - (posW / 2.0f);
-        float posTextY = this.y - (posH / 2.0f);
-
-        graphics.fillRect(posTextX - 1, posTextY - 1, posW + 1, posH + 1);
-        MainMenuState.debugTtf.drawString(posTextX, posTextY, pos);
+        super.renderSuperDebug(graphics);
 
         // Target pos
         String targetPos = Math.round(this.targetX) + ":" + Math.round(this.targetY);
@@ -262,7 +264,7 @@ public abstract class BaseDuck extends Entity {
     // Movement
     public void move(TiledMap map, int delta) {
         // Compute dir
-        if (!this.isMoving) { getNewTarget(); }
+        if (!this.isMoving && this.canGetNewPos) { getNewTarget(); }
 
         // Get the next pos
         double deltaX = this.targetX - this.x;
@@ -287,25 +289,32 @@ public abstract class BaseDuck extends Entity {
             this.y = nextY;
 
             // Update bars
-            this.hpBar.setPos(this.x - 16, this.y - 54);
-            this.fpBar.setPos(this.x - 16, this.y - 48);
-            this.weightBar.setPos(this.x - 16, this.y - 42);
+            this.hpBar.setPos(this.x - (this.width / 2), this.y - this.height - 22);
+            this.fpBar.setPos(this.x - (this.width / 2), this.y - this.height - 16);
+            this.weightBar.setPos(this.x - (this.width / 2), this.y - this.height - 10);
+            this.eatCooldownBar.setPos(this.x - (this.width / 2), this.y - this.height - 8);
 
             getMoveDir();
         }
     }
 
-    private void getNewTarget() {
-        int min = -300;
-        int max = +300;
+    protected void getNewTarget() {
+        //int min = -300;
+        //int max = +300;
 
-        this.targetX = this.x + ThreadLocalRandom.current().nextInt(min, max + 1);
-        this.targetY = this.y + ThreadLocalRandom.current().nextInt(min, max + 1);
+        //this.targetX = this.x + ThreadLocalRandom.current().nextInt(min, max + 1);
+        //this.targetY = this.y + ThreadLocalRandom.current().nextInt(min, max + 1);
+
+        this.targetX = (float) (Math.random() * (864 - 128)) + 128;
+        this.targetY = (float) (Math.random() * (544 - 128)) + 128;
 
         this.isMoving = true;
+
+        if (this instanceof CaptainDuck)
+            ((CaptainDuck) this).queueNewTarget();
     }
 
-    private void getMoveDir() {
+    protected void getMoveDir() {
         float absX = Math.abs(this.targetX);
         float absY = Math.abs(this.targetY);
 
@@ -319,8 +328,13 @@ public abstract class BaseDuck extends Entity {
         }
     }
 
+    public void stop() {
+        this.targetX = this.x;
+        this.targetY = this.y;
+    }
+
     // Food
-    private void loseFoodPoint(int delta) {
+    protected void loseFoodPoint(int delta) {
         // Remove food point or health point
         if (this.fp > 0) {
             this.fp -= .01f * delta;
@@ -346,39 +360,39 @@ public abstract class BaseDuck extends Entity {
         }
     }
 
-    private void eat(List<WaterLily> waterLilies, int delta) {
+    protected void eat(List<WaterLily> waterLilies, int delta) {
         if (this.eatCooldown > .0f) {
             this.eatCooldown -= .01f * delta;
+            this.eatCooldownBar.setValue(this.eatCooldown);
             return;
         }
 
         for (WaterLily waterLily : waterLilies) {
-            float wX = waterLily.getX();
-            float wY = waterLily.getY();
-            int wWidth = 64;
-            int wHeight = 64;
-            int margin = 25;
-
-            if (
-                ((this.x >= wX - (wWidth / 2.0f) - margin) && (this.x <= wX + (wWidth / 2.0f) + margin)) &&
-                ((this.y >= wY - wHeight - margin) && (this.y <= wY + margin))
-            ) {
+            // Add food point if inside
+            if (waterLily.isInsideRadius(this.x, this.y)) {
                 float givenFp = Math.min(30, waterLily.getFp());
 
                 // Add food point
                 this.fp = Math.min(100, this.fp + givenFp);
                 this.weight += 1;
 
+                float growRatio = (float) (1.6 * this.weight);
+
+                this.width = 32 + growRatio;
+                this.height = 32 + growRatio;
+
                 waterLily.setFp(waterLily.getFp() - givenFp);
 
                 // Set cooldown
                 this.eatCooldown = 10;
+                this.eatCooldownBar.setValue(this.eatCooldown);
             }
         }
     }
 
     // Sounds
     public static void loadSounds() throws SlickException {
+        whistle = new Sound("resources/sounds/duck_whistle.ogg");
         explode = new Sound("resources/sounds/duck_explode.ogg");
         dying = new Sound("resources/sounds/duck_drowning.ogg");
     }
