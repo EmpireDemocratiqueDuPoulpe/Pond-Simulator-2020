@@ -59,7 +59,7 @@ public class MainMenuState extends BasicGameState implements ComponentListener {
 
         // MouseOverAreas
         this.buttons = new MouseOverArea[2];
-        this.buttonsActions = new String[]{ "Jouer", "Quitter" };
+        this.buttonsActions = new String[]{ "Contempler", "Quitter" };
 
         int moaX = (int) ((container.getWidth() / 2.0f) - (this.buttonNormal.getWidth() / 2.0f));
         int moaY = this.gameName.getHeight() + 115;
@@ -158,7 +158,7 @@ public class MainMenuState extends BasicGameState implements ComponentListener {
                 String action = this.buttonsActions[i];
 
                 // Actions
-                if (action.equals("Jouer"))
+                if (action.equals("Contempler"))
                     this.game.enterState(PondState.ID);
 
                 else if (action.equals("Quitter"))
