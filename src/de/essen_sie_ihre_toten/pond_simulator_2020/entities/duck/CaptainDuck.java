@@ -73,7 +73,7 @@ public class CaptainDuck extends BaseDuck implements EntityTrigger {
     public void renderSuperDebug(Graphics graphics) {
         super.renderSuperDebug(graphics);
 
-        graphics.setColor(new Color(0, 0, 0));
+        graphics.setColor(new Color(255, 255, 255));
         graphics.drawOval((this.x - this.triggerRadius), (this.y - this.triggerRadius), (this.triggerRadius * 2), (this.triggerRadius * 2));
     }
 

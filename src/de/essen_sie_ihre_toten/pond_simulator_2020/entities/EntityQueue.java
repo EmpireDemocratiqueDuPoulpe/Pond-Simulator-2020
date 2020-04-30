@@ -67,6 +67,20 @@ public class EntityQueue {
     }
 
     public void follow() {
+        if (!(this.leader instanceof EntityMoveable)) return;
+
+        // Get offset between points
+        EntityMoveable lead = ((EntityMoveable) this.leader);
+        float spacing = 25;
+        float offsetX = 0;
+        float offsetY = 0;
+
+        if (this.leader.getX() > lead.getTargetX()) { offsetX = +((this.leader.getWidth() / 2) + spacing); }
+        else if (this.leader.getX() < lead.getTargetX()) { offsetX = -((this.leader.getWidth() / 2) - spacing); }
+
+        if (this.leader.getY() > lead.getTargetY()) { offsetY = +(spacing); }
+        else if (this.leader.getY() < lead.getTargetY()) { offsetY = -(this.leader.getHeight() - spacing); }
+
         for (int i = 0; i < this.members.size(); i++) {
             Entity member = this.members.get(i);
 
@@ -75,7 +89,7 @@ public class EntityQueue {
 
             // Set the new target
             float[] pos = this.lastLeaderPos.get(i);
-            ((EntityMoveable) member).setTarget(pos[0], pos[1]);
+            ((EntityMoveable) member).setTarget(pos[0] + (offsetX * (i + 1)), pos[1] + (offsetY * (i + 1)));
         }
     }
 
