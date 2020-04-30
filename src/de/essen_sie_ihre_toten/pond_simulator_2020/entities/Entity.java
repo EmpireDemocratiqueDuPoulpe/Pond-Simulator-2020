@@ -85,11 +85,11 @@ public abstract class Entity {
     // Methods
     // Rendering
     public static void loadSprites() throws SlickException {}
-    protected static Animation loadAnimation(SpriteSheet spriteSheet, int startX, int endX, int y) {
+    protected static Animation loadAnimation(SpriteSheet spriteSheet, int startX, int endX, int y, int duration) {
         Animation animation = new Animation();
 
         for (int x = startX; x < endX; x++) {
-            animation.addFrame(spriteSheet.getSprite(x, y), 100);
+            animation.addFrame(spriteSheet.getSprite(x, y), duration);
         }
 
         return animation;

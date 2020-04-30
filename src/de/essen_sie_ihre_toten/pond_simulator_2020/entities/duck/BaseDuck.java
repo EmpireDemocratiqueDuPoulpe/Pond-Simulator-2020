@@ -164,27 +164,27 @@ public abstract class BaseDuck extends Entity {
 
     // Methods
     // Rendering
-    public static Animation[] loadSprites(SpriteSheet spriteSheet) {
+    public static Animation[] loadSprites(SpriteSheet spriteSheet, int swimFramesNb) {
         Animation[] animations = new Animation[10];
 
         // Idle
-        animations[0] = loadAnimation(spriteSheet, 0, 1, 0); // Up
-        animations[1] = loadAnimation(spriteSheet, 0, 1, 1); // Left
-        animations[2] = loadAnimation(spriteSheet, 0, 1, 2); // Bottom
-        animations[3] = loadAnimation(spriteSheet, 0, 1, 3); // Right
+        animations[0] = loadAnimation(spriteSheet, 0, 1, 0, 300); // Up
+        animations[1] = loadAnimation(spriteSheet, 0, 1, 1, 300); // Left
+        animations[2] = loadAnimation(spriteSheet, 0, 1, 2, 300); // Bottom
+        animations[3] = loadAnimation(spriteSheet, 0, 1, 3, 300); // Right
 
         // Swim
-        animations[4] = loadAnimation(spriteSheet, 1, 3, 0); // Up
-        animations[5] = loadAnimation(spriteSheet, 1, 3, 1); // Left
-        animations[6] = loadAnimation(spriteSheet, 1, 3, 2); // Bottom
-        animations[7] = loadAnimation(spriteSheet, 1, 3, 3); // Right
+        animations[4] = loadAnimation(spriteSheet, 0, swimFramesNb, 0, 300); // Up
+        animations[5] = loadAnimation(spriteSheet, 0, swimFramesNb, 1, 300); // Left
+        animations[6] = loadAnimation(spriteSheet, 0, swimFramesNb, 2, 300); // Bottom
+        animations[7] = loadAnimation(spriteSheet, 0, swimFramesNb, 3, 300); // Right
 
         // Die
-        animations[8] = loadAnimation(spriteSheet, 0, 5, 4);
+        animations[8] = loadAnimation(spriteSheet, 0, 5, 4, 100);
         animations[8].setLooping(false);
 
         // Explosion
-        animations[9] = loadAnimation(spriteSheet, 0, 6, 5);
+        animations[9] = loadAnimation(spriteSheet, 0, 6, 5, 100);
         animations[9].setLooping(false);
 
         return animations;

@@ -61,7 +61,7 @@ public class CaptainDuck extends BaseDuck implements EntityTrigger {
     public static void loadSprites() throws SlickException {
         SpriteSheet spriteSheet = new SpriteSheet("resources/entities/duck/captainDuck.png", 32, 32, 5);
 
-        animations = BaseDuck.loadSprites(spriteSheet);
+        animations = BaseDuck.loadSprites(spriteSheet, 3);
     }
 
     @Override

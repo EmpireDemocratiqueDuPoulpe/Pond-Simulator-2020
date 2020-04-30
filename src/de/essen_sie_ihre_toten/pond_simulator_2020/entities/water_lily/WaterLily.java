@@ -67,10 +67,10 @@ public class WaterLily extends Entity implements EntityTrigger {
         SpriteSheet spriteSheet = new SpriteSheet("resources/entities/waterLily/waterLily.png", 64, 64, 5);
 
         // Idle
-        animations[0] = loadAnimation(spriteSheet, 0, 1, 0); // Up
-        animations[1] = loadAnimation(spriteSheet, 0, 1, 1); // Left
-        animations[2] = loadAnimation(spriteSheet, 0, 1, 2); // Bottom
-        animations[3] = loadAnimation(spriteSheet, 0, 1, 3); // Right
+        animations[0] = loadAnimation(spriteSheet, 0, 2, 0, 1000); // Up
+        animations[1] = loadAnimation(spriteSheet, 0, 2, 1, 1000); // Left
+        animations[2] = loadAnimation(spriteSheet, 0, 2, 2, 1000); // Bottom
+        animations[3] = loadAnimation(spriteSheet, 0, 2, 3, 1000); // Right
     }
 
     public void render(Graphics graphics) {

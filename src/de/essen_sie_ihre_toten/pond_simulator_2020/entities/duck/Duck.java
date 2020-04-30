@@ -33,6 +33,6 @@ public class Duck extends BaseDuck {
     public static void loadSprites() throws SlickException {
         SpriteSheet spriteSheet = new SpriteSheet("resources/entities/duck/normalDuck.png", 32, 32, 5);
 
-        animations = BaseDuck.loadSprites(spriteSheet);
+        animations = BaseDuck.loadSprites(spriteSheet, 2);
     }
 }
