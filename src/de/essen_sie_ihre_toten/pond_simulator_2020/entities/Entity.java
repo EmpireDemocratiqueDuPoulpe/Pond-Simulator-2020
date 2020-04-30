@@ -18,6 +18,8 @@ public abstract class Entity {
     protected float height;
     protected int dir;
 
+    protected boolean isInQueue;
+
     private static List<Integer> deathList = new ArrayList<>();
 
     // Constructors
@@ -30,6 +32,8 @@ public abstract class Entity {
         this.width = 32;
         this.height = 32;
         this.dir = (int) (Math.random() * (4));
+
+        this.isInQueue = false;
     }
 
     public Entity(float x, float y) {
@@ -41,6 +45,8 @@ public abstract class Entity {
         this.width = 32;
         this.height = 32;
         this.dir = (int) (Math.random() * (4));
+
+        this.isInQueue = false;
     }
 
     public Entity(float x, float y, float width, float height) {
@@ -52,6 +58,8 @@ public abstract class Entity {
         this.width = width;
         this.height = height;
         this.dir = (int) (Math.random() * (4));
+
+        this.isInQueue = false;
     }
 
     public Entity(float x, float y, float width, float height, int dir) {
@@ -63,6 +71,8 @@ public abstract class Entity {
         this.width = width;
         this.height = height;
         this.dir = dir;
+
+        this.isInQueue = false;
     }
 
     // Getters
@@ -72,15 +82,18 @@ public abstract class Entity {
     public float getWidth()                     { return this.width; }
     public float getHeight()                    { return this.height; }
     public int getDir()                         { return this.dir; }
+    public boolean isInQueue()                  { return this.isInQueue; }
     public static List<Integer> getDeathList()  { return deathList; }
     public static boolean deadListNotEmpty()    { return deathList.size() > 0; }
 
     // Setters
-    public void setX(float x)           { this.x = x;}
-    public void setY(float y)           { this.y = y;}
-    public void setWidth(float width)   { this.width = width; }
-    public void setHeight(float height) { this.height = height; }
-    public void setDir(int dir)         { this.dir = dir; }
+    public void setX(float x)                   { this.x = x;}
+    public void setY(float y)                   { this.y = y;}
+    public void setPos(float x, float y)        { this.x = x; this.y = y; }
+    public void setWidth(float width)           { this.width = width; }
+    public void setHeight(float height)         { this.height = height; }
+    public void setDir(int dir)                 { this.dir = dir; }
+    public void setInQueue(boolean isInQueue)   { this.isInQueue = isInQueue; }
 
     // Methods
     // Rendering

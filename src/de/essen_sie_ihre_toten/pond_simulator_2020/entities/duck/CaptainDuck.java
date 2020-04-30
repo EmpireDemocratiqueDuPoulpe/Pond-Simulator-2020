@@ -1,12 +1,13 @@
 package de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck;
 
+import de.essen_sie_ihre_toten.pond_simulator_2020.entities.Entity;
+import de.essen_sie_ihre_toten.pond_simulator_2020.entities.EntityQueue;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.EntityTrigger;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.water_lily.WaterLily;
 import de.essen_sie_ihre_toten.pond_simulator_2020.pond.PondState;
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CaptainDuck extends BaseDuck implements EntityTrigger {
@@ -14,7 +15,7 @@ public class CaptainDuck extends BaseDuck implements EntityTrigger {
     private static int ducksCount;
 
     private float triggerRadius;
-    private List<Integer> queue;
+    private EntityQueue queue;
 
     private static Animation[] animations = new Animation[10];
 
@@ -24,7 +25,7 @@ public class CaptainDuck extends BaseDuck implements EntityTrigger {
         ducksCount++;
 
         this.triggerRadius = 200;
-        this.queue = new ArrayList<>();
+        this.queue = new EntityQueue(this);
     }
 
     public CaptainDuck(float x, float y) {
@@ -32,7 +33,7 @@ public class CaptainDuck extends BaseDuck implements EntityTrigger {
         ducksCount++;
 
         this.triggerRadius = 200;
-        this.queue = new ArrayList<>();
+        this.queue = new EntityQueue(this);
     }
 
     public CaptainDuck(BaseDuck duck) {
@@ -40,20 +41,19 @@ public class CaptainDuck extends BaseDuck implements EntityTrigger {
         ducksCount++;
 
         this.triggerRadius = 200;
-        this.queue = new ArrayList<>();
+        this.queue = new EntityQueue(this);
     }
 
     // Getters
     public static int getDucksCount()   { return ducksCount; }
     public float getTriggerRadius()     { return this.triggerRadius; }
-    public List<Integer> getQueue()     { return this.queue; }
-    public boolean isQueueEmpty()       { return this.queue.size() == 0; }
+    public EntityQueue getQueue()       { return this.queue; }
     public Animation[] getAnimations()  { return animations; }
 
     // Setters
     public void setTriggerRadius(float triggerRadius)   { this.triggerRadius = triggerRadius; }
-    public void setQueue(List<Integer> queue)           { this.queue = queue; }
-    public void addToQueue(int id)                      { if (!isInQueue(id)) this.queue.add(id); }
+    public void setQueue(EntityQueue queue)             { this.queue = queue; }
+    public void addToQueue(Entity entity)               { this.queue.addMember(entity); }
     public static void setDucksCount(int count)         { ducksCount = count; }
 
     // Methods
@@ -80,15 +80,18 @@ public class CaptainDuck extends BaseDuck implements EntityTrigger {
     // Update
     @Override
     public void update(TiledMap map, List<WaterLily> waterLilies, int delta) {
-        // Prevent CaptainDuck from moving if ducks in queue aren't arrived
-        this.canGetNewPos = ducksInQueueArrived();
-
         // Update
+        this.queue.addLastLeaderPos(this.x, this.y);
+
         super.update(map, waterLilies, delta);
+
+        this.queue.follow();
 
         if (!this.isDead && !this.isOverweight) {
             whistle();
         }
+
+
     }
 
     public boolean isInsideRadius(float x, float y) {
@@ -99,89 +102,17 @@ public class CaptainDuck extends BaseDuck implements EntityTrigger {
         if ((Math.random() * (100)) > .01f) return;
 
         whistle.play(1.0f, 0.1f);
-        emptyQueue();
+        this.queue.freeAll();
 
         // Get ducks around;
         List<BaseDuck> ducks = PondState.getDucks();
 
         for (BaseDuck duck : ducks) {
-            if (duck instanceof CaptainDuck) continue;
-            if (duck.isInQueue() || isInQueue(duck.getId())) continue;
+            if ((duck instanceof CaptainDuck)) continue;
 
             if (isInsideRadius(duck.getX(), duck.getY())) {
-                addToQueue(duck.getId());
-
-                duck.setInQueue(true);
-                duck.setCanGetNewPos(false);
-                duck.stop();
+                this.queue.addMember(duck);
             }
         }
-    }
-
-    public boolean isInQueue(int id) {
-        return this.queue.contains(id);
-    }
-
-    public boolean ducksInQueueArrived() {
-        boolean arrived = true;
-
-        if (!isQueueEmpty()) {
-            List<BaseDuck> ducks = PondState.getDucks();
-
-            for (BaseDuck duck : ducks) {
-                if (!(duck instanceof CaptainDuck)) {
-                    if (isInQueue(duck.getId())) {
-                        if (duck.isMoving()) {
-                            arrived = false;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        return arrived;
-    }
-
-    public void queueNewTarget() {
-        List<BaseDuck> ducks = PondState.getDucks();
-        float spaceBetween = 30;
-
-        // Get offset between each ducks
-        float offsetX = 0;
-        float offsetY = 0;
-
-        if (this.x > this.targetX) offsetX = +((this.width / 2) + spaceBetween);
-        else if (this.x < this.targetX) offsetX = -((this.width / 2) - spaceBetween);
-
-        if (this.y > this.targetY) offsetY = -(this.height - spaceBetween);
-        else if (this.y < this.targetY) offsetY = +(spaceBetween);
-
-        // Set pos for the first duck of the queue
-        float dX = this.targetX + offsetX;
-        float dY = this.targetY + offsetY;
-
-        for (BaseDuck duck : ducks) {
-            if (!this.queue.contains(duck.getId())) continue;
-
-            duck.setTarget(dX, dY);
-
-            dX += offsetX;
-            dY += offsetY;
-        }
-    }
-
-    public void emptyQueue() {
-        List<BaseDuck> ducks = PondState.getDucks();
-
-        for (BaseDuck duck : ducks) {
-            if (!isInQueue(duck.getId())) continue;
-
-            duck.setInQueue(false);
-            duck.setCanGetNewPos(true);
-            duck.stop();
-        }
-
-        this.queue = new ArrayList<>();
     }
 }

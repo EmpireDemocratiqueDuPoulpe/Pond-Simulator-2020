@@ -1,6 +1,7 @@
 package de.essen_sie_ihre_toten.pond_simulator_2020.pond;
 
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.Entity;
+import de.essen_sie_ihre_toten.pond_simulator_2020.entities.EntityQueue;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.water_lily.WaterLily;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.BaseDuck;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.CaptainDuck;
@@ -67,6 +68,10 @@ public class PondState extends BasicGameState {
                 new Duck()
             )
         );
+
+        BaseDuck d = ducks.get(0);
+        d.setWeight(10);
+        ducks.set(0, d);
 
         this.waterLilies = new ArrayList<>(
             Arrays.asList(
@@ -160,22 +165,6 @@ public class PondState extends BasicGameState {
             .collect(Collectors.toList());
 
         // Delete dead entities
-        /*if (Entity.deadListNotEmpty()) {
-            ducks.removeIf(ent -> Entity.getDeathList().contains(ent.getId()));
-            this.waterLilies.removeIf(ent -> Entity.getDeathList().contains(ent.getId()));
-
-            // Update ducks count
-            int ducksCount = (int) ducks.stream().filter(duck -> duck instanceof Duck).count();
-            int captainDucksCount = (int) ducks.stream().filter(duck -> duck instanceof CaptainDuck).count();
-
-            if ((ducksCount + captainDucksCount) == 0)
-                this.isEnd = true;
-            else {
-                Duck.setDucksCount(ducksCount);
-                CaptainDuck.setDucksCount(captainDucksCount);
-            }
-        }*/
-
         if (Entity.deadListNotEmpty()) {
             // Water lilies
             this.waterLilies.removeIf(ent -> Entity.getDeathList().contains(ent.getId()));
@@ -186,7 +175,7 @@ public class PondState extends BasicGameState {
             for (BaseDuck duck : ducks) {
                 if (Entity.getDeathList().contains(duck.getId())) {
                     if (duck instanceof CaptainDuck) {
-                        ((CaptainDuck) duck).emptyQueue();
+                        ((CaptainDuck) duck).getQueue().freeAll();
                     }
 
                     ducksIds.add(duck.getId());

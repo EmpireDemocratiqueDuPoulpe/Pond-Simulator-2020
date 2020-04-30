@@ -2,6 +2,7 @@ package de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck;
 
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.Entity;
 
+import de.essen_sie_ihre_toten.pond_simulator_2020.entities.EntityMoveable;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.water_lily.WaterLily;
 import de.essen_sie_ihre_toten.pond_simulator_2020.hud.Bar;
 import de.essen_sie_ihre_toten.pond_simulator_2020.main_menu.MainMenuState;
@@ -9,16 +10,14 @@ import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
 
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
-public abstract class BaseDuck extends Entity {
+public abstract class BaseDuck extends Entity implements EntityMoveable {
     // Attributes
     protected float targetX;
     protected float targetY;
     protected float speed;
     protected boolean isMoving;
     protected boolean canGetNewPos;
-    protected boolean isInQueue;
 
     protected float hp;
     protected float fp;
@@ -100,7 +99,6 @@ public abstract class BaseDuck extends Entity {
         this.speed = duck.getSpeed();
         this.isMoving = duck.isMoving();
         this.canGetNewPos = duck.canGetNewPos();
-        this.isInQueue = duck.isInQueue();
 
         this.hp = duck.getHp();
         this.fp = duck.getFp();
@@ -124,7 +122,6 @@ public abstract class BaseDuck extends Entity {
     public float getSpeed()             { return this.speed; }
     public boolean isMoving()           { return this.isMoving; }
     public boolean canGetNewPos()       { return this.canGetNewPos; }
-    public boolean isInQueue()          { return this.isInQueue; }
     public float getHp()                { return this.hp; }
     public float getFp()                { return this.fp; }
     public int getWeight()              { return this.weight; }
@@ -147,7 +144,6 @@ public abstract class BaseDuck extends Entity {
     public void setSpeed(float speed)                   { this.speed = speed; }
     public void setMoving(boolean isMoving)             { this.isMoving = isMoving; }
     public void setCanGetNewPos(boolean canGetNewPos)   { this.canGetNewPos = canGetNewPos; }
-    public void setInQueue(boolean isInQueue)           { this.isInQueue = isInQueue; }
     public void setHp(float hp)                         { this.hp = Math.min(100, hp); }
     public void setFp(float fp)                         { this.fp = Math.min(100, fp); }
     public void setWeight(int weight)                   { this.weight = weight; }
@@ -299,19 +295,10 @@ public abstract class BaseDuck extends Entity {
     }
 
     protected void getNewTarget() {
-        //int min = -300;
-        //int max = +300;
-
-        //this.targetX = this.x + ThreadLocalRandom.current().nextInt(min, max + 1);
-        //this.targetY = this.y + ThreadLocalRandom.current().nextInt(min, max + 1);
-
         this.targetX = (float) (Math.random() * (864 - 128)) + 128;
         this.targetY = (float) (Math.random() * (544 - 128)) + 128;
 
         this.isMoving = true;
-
-        if (this instanceof CaptainDuck)
-            ((CaptainDuck) this).queueNewTarget();
     }
 
     protected void getMoveDir() {
