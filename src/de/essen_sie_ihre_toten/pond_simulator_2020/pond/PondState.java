@@ -19,6 +19,7 @@ import org.newdawn.slick.tiled.TiledMap;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -104,9 +105,9 @@ public class PondState extends BasicGameState {
             waterLily.render(graphics);
         }
 
-        for (BaseDuck duck : ducks) {
-            duck.render(graphics);
-        }
+        ducks.stream()
+            .sorted(Comparator.comparingDouble(BaseDuck::getY))
+            .forEach(d -> d.render(graphics));
 
         // Map layers in front of entities
         this.map.render(0, 0, this.map.getLayerIndex("aboveEntities"));
