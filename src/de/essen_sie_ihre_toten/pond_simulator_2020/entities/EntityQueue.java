@@ -60,7 +60,7 @@ public class EntityQueue {
 
     // Queue
     public void addMember(Entity member) {
-        if (!isInQueue(member) && !member.isInQueue()) {
+        if ((!isInQueue(member)) && (!member.isInQueue()) && (this.members.size() < this.sizeLimit)) {
             this.members.add(member);
             member.setInQueue(true);
         }
