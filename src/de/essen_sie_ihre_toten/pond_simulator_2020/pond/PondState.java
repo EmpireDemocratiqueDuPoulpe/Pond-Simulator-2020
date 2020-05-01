@@ -1,7 +1,7 @@
 package de.essen_sie_ihre_toten.pond_simulator_2020.pond;
 
+import de.essen_sie_ihre_toten.pond_simulator_2020.EditorScreenState;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.Entity;
-import de.essen_sie_ihre_toten.pond_simulator_2020.entities.EntityQueue;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.water_lily.WaterLily;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.BaseDuck;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.CaptainDuck;
@@ -16,6 +16,7 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.tiled.TiledMap;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 
 public class PondState extends BasicGameState {
     // Attributes
-    public static final int ID = 2;
+    public static final int ID = 3;
     private GameContainer container;
     private StateBasedGame game;
     private boolean isEnd;
@@ -34,8 +35,6 @@ public class PondState extends BasicGameState {
     private HUD hud;
     private static List<BaseDuck> ducks;
     private List<WaterLily> waterLilies;
-
-    private Music bgMusic;
 
     // Getters
     public int getID()                          { return ID; }
@@ -69,10 +68,6 @@ public class PondState extends BasicGameState {
             )
         );
 
-        BaseDuck d = ducks.get(0);
-        d.setWeight(10);
-        ducks.set(0, d);
-
         this.waterLilies = new ArrayList<>(
             Arrays.asList(
                 new WaterLily(),
@@ -91,7 +86,6 @@ public class PondState extends BasicGameState {
             WaterLily.loadSprites();
 
             // Sounds
-            loadMusics();
             BaseDuck.loadSounds();
         } catch (SlickException sE) {
             sE.printStackTrace();
@@ -136,6 +130,8 @@ public class PondState extends BasicGameState {
 
     @Override
     public void update(GameContainer container, StateBasedGame game, int delta) {
+        EditorScreenState.nextMusic();
+
         if (this.isEnd) return;
 
         // Add new entities
@@ -143,7 +139,7 @@ public class PondState extends BasicGameState {
             this.waterLilies.add(new WaterLily());
 
         if (Duck.getDucksCount() >= 2)
-            if ((Math.random() * (100)) <= .01f)
+            if ((Math.random() * (100)) <= .015f)
                 ducks.add(new Duck());
 
         // Update entities
@@ -216,26 +212,6 @@ public class PondState extends BasicGameState {
         else if (Input.KEY_F == key)        { BaseDuck.setCanEat(!BaseDuck.canEat()); }
         // Exit game with ESC
         else if (Input.KEY_ESCAPE == key)   { this.container.exit(); }
-    }
-
-    // Musics
-    private void loadMusics() throws SlickException {
-        /*File[] files = folder.listFiles();
-
-        if (files != null) {
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    loadMusics(file);
-                } else if (file.getName().endsWith(".ogg")) {
-                    System.out.println(file.getPath());
-                }
-            }
-        }*/
-
-        // Background music
-        this.bgMusic = new Music("resources/musics/m1.ogg");
-        this.bgMusic.loop();
-        this.bgMusic.setVolume(0.5f);
     }
 
     // Others
