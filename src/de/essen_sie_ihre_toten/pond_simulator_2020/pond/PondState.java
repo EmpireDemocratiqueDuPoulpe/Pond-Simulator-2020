@@ -7,8 +7,8 @@ import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.BaseDuck;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.CaptainDuck;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.Duck;
 import de.essen_sie_ihre_toten.pond_simulator_2020.hud.HUD;
-
 import de.essen_sie_ihre_toten.pond_simulator_2020.main_menu.MainMenuState;
+
 import org.newdawn.slick.*;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
@@ -16,7 +16,6 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.tiled.TiledMap;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;

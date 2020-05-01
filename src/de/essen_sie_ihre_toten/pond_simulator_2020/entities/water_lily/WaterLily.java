@@ -1,9 +1,9 @@
 package de.essen_sie_ihre_toten.pond_simulator_2020.entities.water_lily;
 
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.Entity;
-
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.EntityTrigger;
 import de.essen_sie_ihre_toten.pond_simulator_2020.hud.Bar;
+
 import org.newdawn.slick.*;
 
 public class WaterLily extends Entity implements EntityTrigger {
