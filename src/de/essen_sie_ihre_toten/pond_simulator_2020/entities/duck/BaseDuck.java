@@ -388,7 +388,7 @@ public abstract class BaseDuck extends Entity implements EntityMoveable {
         // Play sound
         if (!this.isPlayingSound) {
             if (this.isOverweight) { explode.play(1.0f, 0.2f); this.isPlayingSound = true; } // Explode (overweight)
-            else if (this.isDead) { dying.play(1.0f, 0.2f);  this.isPlayingSound = true; } // Die (drowning)
+            else if (this.isDead) { dying.play(1.0f, 0.1f);  this.isPlayingSound = true; } // Die (drowning)
         // Check if there's no sound playing
         } else if (!explode.playing() && !dying.playing()) {
             this.isPlayingSound = false;

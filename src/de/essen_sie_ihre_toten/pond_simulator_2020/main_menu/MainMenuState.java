@@ -1,5 +1,6 @@
 package de.essen_sie_ihre_toten.pond_simulator_2020.main_menu;
 
+import de.essen_sie_ihre_toten.pond_simulator_2020.EditorScreenState;
 import de.essen_sie_ihre_toten.pond_simulator_2020.pond.PondState;
 
 import org.newdawn.slick.*;
@@ -18,7 +19,7 @@ import java.io.IOException;
 
 public class MainMenuState extends BasicGameState implements ComponentListener {
     // Attributes
-    public static final int ID = 1;
+    public static final int ID = 2;
     private GameContainer container;
     private StateBasedGame game;
 
@@ -47,8 +48,6 @@ public class MainMenuState extends BasicGameState implements ComponentListener {
         this.container = container;
         this.game = game;
 
-        this.container.setShowFPS(false);
-
         // Load images and fonts
         try {
             loadImages();
@@ -75,19 +74,14 @@ public class MainMenuState extends BasicGameState implements ComponentListener {
     }
 
     // Rendering
-    private void loadImages() {
-        try {
-            this.container.setIcon("resources/hud/ducksCount.png");
-            this.background = new Image("resources/ui/mainMenuBg.png");
-            this.gameName = new Image("resources/ui/gameName.png");
-            this.editor = new Image("resources/ui/editor.png");
-            this.seal = new Image("resources/ui/seal.png");
-            this.buttonNormal = new Image("resources/ui/buttons/button.png");
-            this.buttonHover = new Image("resources/ui/buttons/buttonHover.png");
-            this.buttonPressed = new Image("resources/ui/buttons/buttonPressed.png");
-        } catch (SlickException e) {
-            e.printStackTrace();
-        }
+    private void loadImages() throws SlickException {
+        this.background = new Image("resources/ui/mainMenuBg.png");
+        this.gameName = new Image("resources/ui/gameName.png");
+        this.editor = new Image("resources/ui/editor.png");
+        this.seal = new Image("resources/ui/seal.png");
+        this.buttonNormal = new Image("resources/ui/buttons/button.png");
+        this.buttonHover = new Image("resources/ui/buttons/buttonHover.png");
+        this.buttonPressed = new Image("resources/ui/buttons/buttonPressed.png");
     }
 
     private void loadFonts() throws FontFormatException, IOException, SlickException {
@@ -141,7 +135,7 @@ public class MainMenuState extends BasicGameState implements ComponentListener {
     // Update
     @Override
     public void update(GameContainer container, StateBasedGame game, int delta) {
-
+        EditorScreenState.nextMusic();
     }
 
     // Events

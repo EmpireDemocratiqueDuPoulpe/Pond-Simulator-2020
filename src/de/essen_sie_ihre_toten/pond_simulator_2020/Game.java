@@ -22,6 +22,7 @@ public class Game extends StateBasedGame {
     // Methods
     @Override
     public void initStatesList(GameContainer container) {
+        addState(new EditorScreenState());
         addState(new MainMenuState());
         addState(new PondState());
     }
