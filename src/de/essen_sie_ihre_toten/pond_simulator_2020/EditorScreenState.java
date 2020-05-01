@@ -25,6 +25,7 @@ public class EditorScreenState extends BasicGameState {
     private float delayBeforeDecrease;
 
     private static List<Music> bgMusics;
+    private static int lastMusicId;
 
     // Getters
     public int getID() { return ID; }
@@ -39,6 +40,7 @@ public class EditorScreenState extends BasicGameState {
 
         // Load images and musics
         bgMusics = new ArrayList<>();
+        lastMusicId = -1;
 
         try {
             loadImages();
@@ -136,7 +138,15 @@ public class EditorScreenState extends BasicGameState {
             if (music.playing()) return;
         }
 
-        int r = (int) (Math.random() * (bgMusics.size()));
+        // Start new music
+        int r = lastMusicId;
+
+        do {
+            r = (int) (Math.random() * (bgMusics.size()));
+        } while (lastMusicId == r);
+
+        lastMusicId = r;
+
         bgMusics.get(r).play(1.0f, .25f);
     }
 }
