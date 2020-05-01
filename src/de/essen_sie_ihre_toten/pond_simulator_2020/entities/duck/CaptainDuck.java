@@ -85,10 +85,11 @@ public class CaptainDuck extends BaseDuck implements EntityTrigger {
 
         super.update(map, waterLilies, delta);
 
-        this.queue.follow();
-
         if (!this.isDead && !this.isOverweight) {
+            this.queue.follow();
             whistle();
+        } else {
+            this.queue.freeAll();
         }
 
 
@@ -99,9 +100,9 @@ public class CaptainDuck extends BaseDuck implements EntityTrigger {
     }
 
     public void whistle() {
-        if ((Math.random() * (100)) > .01f) return;
+        if ((Math.random() * (100)) > .005f) return;
 
-        whistle.play(1.0f, 0.1f);
+        whistle.play(1.0f, .1f);
         this.queue.freeAll();
 
         // Get ducks around;
