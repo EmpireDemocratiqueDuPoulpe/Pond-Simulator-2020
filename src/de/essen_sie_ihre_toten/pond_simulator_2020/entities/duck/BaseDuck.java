@@ -217,7 +217,7 @@ public abstract class BaseDuck extends Entity implements EntityMoveable {
         // Bars
         this.hpBar.draw(graphics);
         this.fpBar.draw(graphics);
-        this.weightBar.draw(graphics);
+        this.weightBar.draw(graphics, 10);
         this.eatCooldownBar.draw(graphics);
     }
 

@@ -124,4 +124,15 @@ public class Bar {
         graphics.setColor(this.barColor);
         graphics.fillRect(this.x, this.y, (this.value * this.width) / this.maxValue, this.height);
     }
+
+    public void draw(Graphics graphics, int markerValue) {
+
+        // Background and bar
+        draw(graphics);
+
+        // Marker value
+        float markerX = this.x + ((this.width * markerValue) / this.maxValue);
+        graphics.setColor(red);
+        graphics.drawLine(markerX, this.y - 1, markerX, this.y + this.height + 1);
+    }
 }
