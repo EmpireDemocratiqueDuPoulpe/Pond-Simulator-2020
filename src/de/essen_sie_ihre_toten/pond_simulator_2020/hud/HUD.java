@@ -25,6 +25,7 @@ public class HUD {
                 put("No food", new Image("./src/resources/keys/key_f.png"));
                 put("Quitter", new Image("./src/resources/keys/key_esc.png"));
                 put("Debug", new Image("./src/resources/keys/key_d.png"));
+                put("Pause", new Image("./src/resources/keys/key_p.png"));
             }
         };
     }
@@ -67,6 +68,7 @@ public class HUD {
                     color = Color.yellow;
             }
             else if (name.equals("No food") && !BaseDuck.canEat())  { color = Color.yellow; }
+            else if (name.equals("Pause") && container.isPaused())  { color = Color.yellow; }
 
             // Draw the key
             graphics.drawImage(image, keyDX, keyDY);

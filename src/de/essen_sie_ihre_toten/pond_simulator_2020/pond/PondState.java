@@ -2,6 +2,7 @@ package de.essen_sie_ihre_toten.pond_simulator_2020.pond;
 
 import de.essen_sie_ihre_toten.pond_simulator_2020.EditorScreenState;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.Entity;
+import de.essen_sie_ihre_toten.pond_simulator_2020.entities.rock.Rock;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.water_lily.WaterLily;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.BaseDuck;
 import de.essen_sie_ihre_toten.pond_simulator_2020.entities.duck.CaptainDuck;
@@ -21,6 +22,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PondState extends BasicGameState {
     // Attributes
@@ -35,12 +37,14 @@ public class PondState extends BasicGameState {
     private HUD hud;
     private static List<BaseDuck> ducks;
     private List<WaterLily> waterLilies;
+    private static List<Rock> rocks;
 
     // Getters
     public int getID()                          { return ID; }
     public static boolean debugActivated()      { return debug; }
     public static boolean superDebugActivated() { return superDebug; }
     public static List<BaseDuck> getDucks()     { return ducks; }
+    public static List<Rock> getRocks()         { return rocks; }
 
     // Methods
     // Slick2D
@@ -77,6 +81,15 @@ public class PondState extends BasicGameState {
             )
         );
 
+        rocks = new ArrayList<>(
+            Arrays.asList(
+                new Rock(),
+                new Rock(),
+                new Rock(),
+                new Rock()
+            )
+        );
+
         // Load spritesheets, sounds and fonts
         try {
             // Sprites
@@ -84,6 +97,8 @@ public class PondState extends BasicGameState {
             CaptainDuck.loadSprites();
 
             WaterLily.loadSprites();
+
+            Rock.loadSprites();
 
             // Sounds
             BaseDuck.loadSounds();
@@ -94,7 +109,7 @@ public class PondState extends BasicGameState {
 
     @Override
     public void render(GameContainer container, StateBasedGame game, Graphics graphics) {
-        if (this.isEnd) { renderEnd(graphics); return; }
+        if (this.isEnd)                 { renderEnd(graphics); return; }
 
         // Normal level of the map
         this.map.render(0, 0, this.map.getLayerIndex("Pond"));
@@ -104,9 +119,9 @@ public class PondState extends BasicGameState {
             waterLily.render(graphics);
         }
 
-        ducks.stream()
-            .sorted(Comparator.comparingDouble(BaseDuck::getY))
-            .forEach(d -> d.render(graphics));
+        Stream.concat(ducks.stream(), rocks.stream())
+            .sorted(Comparator.comparingDouble(Entity::getY))
+            .forEach(e -> e.render(graphics));
 
         // Map layers in front of entities
         this.map.render(0, 0, this.map.getLayerIndex("aboveEntities"));
@@ -116,6 +131,11 @@ public class PondState extends BasicGameState {
 
         // Debug
         if (debug) {
+            for (Rock rock : rocks) {
+                rock.renderDebug(graphics);
+                if (superDebug) rock.renderSuperDebug(graphics);
+            }
+
             for (WaterLily waterLily : this.waterLilies) {
                 waterLily.renderDebug(graphics);
                 if (superDebug) waterLily.renderSuperDebug(graphics);
@@ -126,6 +146,10 @@ public class PondState extends BasicGameState {
                 if (superDebug) duck.renderSuperDebug(graphics);
             }
         }
+
+        // Pause
+        if (this.container.isPaused())
+            renderPause(graphics);
     }
 
     @Override
@@ -133,6 +157,7 @@ public class PondState extends BasicGameState {
         EditorScreenState.nextMusic();
 
         if (this.isEnd) return;
+        if (this.container.isPaused()) return;
 
         // Add new entities
         if ((Math.random() * (100)) <= .08f)
@@ -195,26 +220,56 @@ public class PondState extends BasicGameState {
 
     @Override
     public void keyReleased(int key, char c) {
-        // Activate debug
-        if (Input.KEY_D == key) {
-            if (!debug) {
-                debug = true;
-            } else if (!superDebug) {
-                superDebug = true;
-            } else {
-                debug = false;
-                superDebug = false;
+        // Pause the pond
+        if (Input.KEY_P == key)
+            this.container.setPaused(!this.container.isPaused());
+
+        // Exit game with ESC
+        if (Input.KEY_ESCAPE == key)
+            this.container.exit();
+
+        if (!this.container.isPaused()) {
+            // Activate debug
+            if (Input.KEY_D == key) {
+                if (!debug) {
+                    debug = true;
+                } else if (!superDebug) {
+                    superDebug = true;
+                } else {
+                    debug = false;
+                    superDebug = false;
+                }
+
+                this.container.setShowFPS(debug);
             }
 
-            this.container.setShowFPS(debug);
+            // Prevent ducks from eating
+            if (Input.KEY_F == key)
+                BaseDuck.setCanEat(!BaseDuck.canEat());
         }
-        // Prevent ducks from eating
-        else if (Input.KEY_F == key)        { BaseDuck.setCanEat(!BaseDuck.canEat()); }
-        // Exit game with ESC
-        else if (Input.KEY_ESCAPE == key)   { this.container.exit(); }
     }
 
     // Others
+    private void renderPause(Graphics graphics) {
+        graphics.setColor(new Color(0, 0, 0, .5f));
+        graphics.fillRect(0, 0, container.getWidth(), container.getHeight());
+
+        String message = "Pause";
+        String message2 = "Appuyez sur \"P\" pour reprendre.";
+
+        MainMenuState.endTtf.drawString(
+                ((float) container.getWidth() / 2) - ((float) MainMenuState.endTtf.getWidth(message) / 2),
+                (((float) container.getHeight() / 2) - ((float) MainMenuState.endTtf.getHeight(message) / 2)) - 25,
+                message
+        );
+
+        MainMenuState.endTtf.drawString(
+                ((float) container.getWidth() / 2) - ((float) MainMenuState.endTtf.getWidth(message2) / 2),
+                ((float) container.getHeight() / 2) - ((float) MainMenuState.endTtf.getHeight(message2) / 2) + 25,
+                message2
+        );
+    }
+
     private void renderEnd(Graphics graphics) {
         graphics.setColor(new Color(0, 0, 0));
         graphics.fillRect(0, 0, container.getWidth(), container.getHeight());
