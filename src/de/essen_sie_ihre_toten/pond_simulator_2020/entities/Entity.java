@@ -1,7 +1,9 @@
 package de.essen_sie_ihre_toten.pond_simulator_2020.entities;
 
+import de.essen_sie_ihre_toten.pond_simulator_2020.entities.rock.Rock;
 import de.essen_sie_ihre_toten.pond_simulator_2020.main_menu.MainMenuState;
 
+import de.essen_sie_ihre_toten.pond_simulator_2020.pond.PondState;
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
 
@@ -161,7 +163,13 @@ public abstract class Entity {
             );
 
             collision = color.getAlpha() > 0;
-        }
+        } /*else {
+            for (Rock rock : PondState.getRocks()) {
+                collision = rock.isInside(nextX, nextY);
+
+                if (collision) break;
+            }
+        }*/
 
         return collision;
     }
